@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.api.proxy import router as proxy_router
 from app.api.keys import router as keys_router
+from app.api.billing import router as billing_router
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -20,12 +21,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount routes
+# Mount all endpoints
 app.include_router(proxy_router)
 app.include_router(keys_router)
+app.include_router(billing_router)
 
 
-@app.get("/health")
+# Accepts both GET and HEAD for uptime monitors
+@app.api_route("/health", methods=["GET", "HEAD"])
 async def health_check():
     return {
         "status": "online",
@@ -34,7 +37,7 @@ async def health_check():
     }
 
 
-@app.get("/")
+@app.api_route("/", methods=["GET", "HEAD"])
 async def root():
     return {
         "message": "AI Circuit Breaker Proxy is active.",
