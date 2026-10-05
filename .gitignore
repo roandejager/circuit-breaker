@@ -1,0 +1,20 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment Secrets (NEVER COMMIT)
+.env
+.env.local
+.env.production
+
+# Node & Next.js
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+
+# Operating System
+.DS_Store
+Thumbs.db
