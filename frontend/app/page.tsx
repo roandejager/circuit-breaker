@@ -236,7 +236,7 @@ export default function Home() {
             <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 font-mono text-xs text-zinc-300">
               <div className="text-zinc-500 mb-2"># 1-Line Drop-In Protection:</div>
               <div className="text-emerald-400 font-bold">client = OpenAI(</div>
-              <div className="pl-4 text-zinc-300">base_url="http://localhost:8000/v1",</div>
+              <div className="pl-4 text-zinc-300">base_url="https://circuit-breaker-api.onrender.com/v1",</div>
               <div className="pl-4 text-zinc-300">api_key="cb_live_..."</div>
               <div className="text-emerald-400 font-bold">)</div>
             </div>
@@ -503,7 +503,7 @@ export default function Home() {
                 </div>
                 <button
                   onClick={() => {
-                    const snippet = `from openai import OpenAI\n\n# 1-Line Circuit Breaker Drop-In\nclient = OpenAI(\n    base_url="http://localhost:8000/v1",\n    api_key="${newKey || 'cb_live_your_proxy_key'}"\n)`;
+                    const snippet = `from openai import OpenAI\n\n# 1-Line Circuit Breaker Drop-In\nclient = OpenAI(\n    base_url="https://circuit-breaker-api.onrender.com/v1",\n    api_key="${newKey || 'cb_live_your_proxy_key'}"\n)`;
                     navigator.clipboard.writeText(snippet);
                     setCopiedSnippet(true);
                     setTimeout(() => setCopiedSnippet(false), 2000);
@@ -522,7 +522,7 @@ export default function Home() {
                 <span className="text-zinc-500">from</span> openai <span className="text-zinc-500">import</span> OpenAI{'\n\n'}
                 <span className="text-zinc-500"># Point client to Circuit Breaker Proxy</span>{'\n'}
                 client = OpenAI({'\n'}
-                {'    '}base_url=<span className="text-emerald-400">"http://localhost:8000/v1"</span>,{'\n'}
+                {'    '}base_url=<span className="text-emerald-400">"https://circuit-breaker-api.onrender.com/v1"</span>,{'\n'}
                 {'    '}api_key=<span className="text-emerald-400">"{newKey || 'cb_live_your_proxy_key'}"</span>{'\n'}
                 ){'\n\n'}
                 <span className="text-zinc-500"># Autonomous Agent calls continue identically:</span>{'\n'}
