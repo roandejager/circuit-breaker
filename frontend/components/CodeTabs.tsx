@@ -11,6 +11,20 @@ const code = {
 
 type Language = keyof typeof code;
 
+function highlightCode(source: string) {
+  const parts = source.split(/("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|\b(?:from|import|const|new|base_url|baseURL|api_key|apiKey|curl|POST|false|true)\b)/g);
+
+  return parts.map((part, index) => {
+    const isString = part.startsWith('"') || part.startsWith("'");
+    const isKeyword = /^(from|import|const|new|curl|POST|false|true)$/.test(part);
+    const isProperty = /^(base_url|baseURL|api_key|apiKey)$/.test(part);
+
+    if (!isString && !isKeyword && !isProperty) return part;
+    const color = isString ? 'text-zinc-400' : isKeyword ? 'text-zinc-100' : 'text-zinc-300';
+    return <span key={`${part}-${index}`} className={color}>{part}</span>;
+  });
+}
+
 export function CodeTabs() {
   const [language, setLanguage] = useState<Language>('Python');
   const [copied, setCopied] = useState(false);
@@ -39,8 +53,8 @@ export function CodeTabs() {
               role="tab"
               aria-selected={language === name}
               onClick={() => { setLanguage(name); setCopied(false); setCopyError(''); }}
-              className={`border-b-2 px-3 py-3 font-mono text-xs ${
-                language === name ? 'border-emerald-500 text-white' : 'border-transparent text-zinc-500 hover:text-zinc-300'
+              className={`border-b px-3 py-3 font-mono text-xs ${
+                language === name ? 'border-zinc-300 text-white' : 'border-transparent text-zinc-500 hover:text-zinc-300'
               }`}
             >
               {name}
@@ -52,7 +66,7 @@ export function CodeTabs() {
           {copied ? 'Copied' : 'Copy'}
         </button>
       </div>
-      <pre role="tabpanel" className="overflow-x-auto p-4 font-mono text-xs leading-6 text-zinc-300 sm:p-5"><code>{code[language]}</code></pre>
+      <pre role="tabpanel" className="overflow-x-auto p-4 font-mono text-xs leading-6 text-zinc-300 sm:p-5"><code>{highlightCode(code[language])}</code></pre>
       {copyError && <p role="alert" className="border-t border-rose-900/60 px-4 py-2 text-xs text-rose-300">{copyError}</p>}
     </div>
   );

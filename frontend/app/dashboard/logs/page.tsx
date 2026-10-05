@@ -32,7 +32,7 @@ function statusDetails(log: RequestLog) {
   if (log.was_blocked) {
     return { label: '400 LOOP_KILLED', className: 'border-rose-900 bg-rose-950/40 text-rose-300' };
   }
-  return { label: `${log.status_code ?? 200} OK`, className: 'border-emerald-900 bg-emerald-950/40 text-emerald-300' };
+  return { label: `${log.status_code ?? 200} OK`, className: 'border-zinc-700 bg-zinc-900 text-zinc-300' };
 }
 
 export default function RequestLogsPage() {
@@ -113,7 +113,7 @@ export default function RequestLogsPage() {
               <select
                 value={statusFilter}
                 onChange={(event) => setStatusFilter(event.target.value as StatusFilter)}
-                className="appearance-none rounded border border-zinc-800 bg-[#08090a] py-1.5 pl-2.5 pr-7 text-xs text-zinc-200 outline-none focus:border-zinc-600"
+                className="appearance-none rounded border border-zinc-800 bg-[#090a0f] py-1.5 pl-2.5 pr-7 text-xs text-zinc-200 outline-none focus:border-zinc-600"
               >
                 <option value="all">All</option>
                 <option value="blocked">Blocked Loops Only</option>
@@ -128,7 +128,7 @@ export default function RequestLogsPage() {
               <select
                 value={modelFilter}
                 onChange={(event) => setModelFilter(event.target.value as ModelFilter)}
-                className="appearance-none rounded border border-zinc-800 bg-[#08090a] py-1.5 pl-2.5 pr-7 text-xs text-zinc-200 outline-none focus:border-zinc-600"
+                className="appearance-none rounded border border-zinc-800 bg-[#090a0f] py-1.5 pl-2.5 pr-7 text-xs text-zinc-200 outline-none focus:border-zinc-600"
               >
                 <option value="all">All models</option>
                 <option value="gpt-4o">gpt-4o</option>
@@ -221,7 +221,7 @@ export default function RequestLogsPage() {
               </dl>
               <div>
                 <h3 className="mb-2 font-mono text-[10px] uppercase tracking-widest text-zinc-500">Full JSON metadata</h3>
-                <pre className="max-h-[55vh] overflow-auto rounded border border-zinc-800 bg-[#08090a] p-3 font-mono text-[11px] leading-5 text-zinc-300">{JSON.stringify(selectedLog, null, 2)}</pre>
+                <pre className="max-h-[55vh] overflow-auto rounded border border-zinc-800 bg-[#090a0f] p-3 font-mono text-[11px] leading-5 text-zinc-300">{JSON.stringify(selectedLog, null, 2)}</pre>
               </div>
             </div>
           </aside>

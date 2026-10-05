@@ -1,0 +1,26 @@
+# AI Circuit Breaker
+
+> The Zero-Overhead Reverse Proxy & Infinite-Loop Firewall for Autonomous AI Agents.
+
+AI Circuit Breaker intercepts chat completion calls to upstream providers (OpenAI, Anthropic), detects recursive agent error loops using a sliding-window SHA-256 hash deque, and kills runaway streams before budget exhaustion.
+
+## Quickstart Drop-in
+- Base URL: https://circuit-breaker-api.onrender.com/v1
+- Upstream Compatibility: 100% OpenAI /v1/chat/completions compatible.
+- Latency Overhead: <35ms.
+- Streaming: Unbuffered Server-Sent Events (SSE).
+
+## Integration Example (Python)
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://circuit-breaker-api.onrender.com/v1",
+    api_key="cb_live_your_proxy_key"
+)
+
+response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[{"role": "user", "content": "Execute agent task..."}],
+    stream=True
+)

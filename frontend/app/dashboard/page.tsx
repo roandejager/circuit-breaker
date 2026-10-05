@@ -173,8 +173,8 @@ export default function DashboardPage() {
       <section aria-label="Gateway status" className="rounded-md border border-white/[0.08] bg-[#0d0e12]">
         <div className="flex items-center justify-between border-b border-white/[0.08] px-4 py-3">
           <h2 className="text-sm font-medium text-zinc-200">Gateway status</h2>
-          <span className="inline-flex items-center gap-2 font-mono text-[11px] text-emerald-400">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> OPERATIONAL
+          <span className="inline-flex items-center gap-2 font-mono text-[11px] text-zinc-400">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" /> OPERATIONAL
           </span>
         </div>
         <div className="grid divide-y divide-white/[0.08] sm:grid-cols-2 sm:divide-y-0 lg:grid-cols-4">
@@ -199,7 +199,7 @@ export default function DashboardPage() {
               <KeyRound aria-hidden="true" className="h-4 w-4 text-zinc-500" />
               <h2 className="text-sm font-medium text-zinc-200">Quick start</h2>
             </div>
-            <Link href="/dashboard/keys" className="font-mono text-[11px] text-emerald-400 hover:text-emerald-300">Manage keys</Link>
+            <Link href="/dashboard/keys" className="font-mono text-[11px] text-zinc-400 hover:text-zinc-200">Manage keys</Link>
           </div>
           <div className="p-4">
             <p className="mb-3 text-xs text-zinc-500">
@@ -223,9 +223,9 @@ export default function DashboardPage() {
                 </button>
               ))}
             </div>
-            <pre className="overflow-x-auto rounded border border-zinc-800 bg-[#08090a] p-4 font-mono text-xs leading-6 text-zinc-300"><code>{snippets[snippetLanguage]}</code></pre>
+            <pre className="overflow-x-auto rounded border border-zinc-800 bg-[#090a0f] p-4 font-mono text-xs leading-6 text-zinc-300"><code>{snippets[snippetLanguage]}</code></pre>
             {!latestKey && (
-              <Link href="/dashboard/keys" className="mt-3 inline-flex items-center gap-1 text-xs text-emerald-400 hover:text-emerald-300">
+              <Link href="/dashboard/keys" className="mt-3 inline-flex items-center gap-1 text-xs text-zinc-400 hover:text-zinc-200">
                 Provision your first key <ArrowRight aria-hidden="true" className="h-3 w-3" />
               </Link>
             )}
@@ -238,7 +238,7 @@ export default function DashboardPage() {
               <Clock3 aria-hidden="true" className="h-4 w-4 text-zinc-500" />
               <h2 className="text-sm font-medium text-zinc-200">Recent incidents</h2>
             </div>
-            <Link href="/dashboard/logs" className="font-mono text-[11px] text-emerald-400 hover:text-emerald-300">View logs</Link>
+            <Link href="/dashboard/logs" className="font-mono text-[11px] text-zinc-400 hover:text-zinc-200">View logs</Link>
           </div>
           <div className="divide-y divide-white/[0.06]">
             {logs.filter((log) => log.was_blocked).slice(0, 3).map((incident) => (

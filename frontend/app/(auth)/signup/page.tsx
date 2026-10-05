@@ -30,27 +30,27 @@ export default function SignupPage() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#08090a] px-4 py-12 text-zinc-100">
-      <section className="w-full max-w-md rounded-md border border-white/[0.08] bg-[#0d0e12] p-7 sm:p-9">
-        <Link href="/" className="mb-8 inline-flex items-center gap-2 font-mono text-sm font-semibold tracking-tight text-white">
-          <ShieldAlert aria-hidden="true" className="h-5 w-5 text-emerald-400" />
-          AI Circuit Breaker
+    <main className="flex min-h-screen items-center justify-center bg-[#090a0f]/90 px-4 py-10 text-zinc-100">
+      <section className="w-full max-w-[360px] rounded-lg border border-zinc-800/80 bg-[#0d0f14] p-6 shadow-2xl">
+        <Link href="/" className="mb-6 inline-flex items-center gap-2.5 text-zinc-100">
+          <ShieldAlert aria-hidden="true" className="h-6 w-6 text-zinc-400" />
+          <span className="font-mono text-xs font-semibold tracking-tight">AI Circuit Breaker</span>
         </Link>
-        <h1 className="text-2xl font-semibold tracking-tight text-white">Create your account</h1>
-        <p className="mt-2 text-sm text-zinc-400">
+        <h1 className="text-lg font-semibold tracking-tight text-white">Create Gateway Account</h1>
+        <p className="mt-1.5 text-xs text-zinc-500">
           Start on the free tier. We monitor up to <span className="font-mono text-zinc-200">$15/mo</span> in LLM spend.
         </p>
 
         {error && (
-          <div role="alert" className="mt-6 flex gap-2 rounded border border-rose-900 bg-rose-950/50 p-3 text-sm text-rose-300">
+          <div role="alert" className="mt-5 flex gap-2 rounded border border-rose-900/70 bg-rose-950/30 p-3 text-xs text-rose-300">
             <AlertTriangle aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="mt-7 space-y-5">
+        <form onSubmit={handleSubmit} className="mt-5 space-y-4">
           <div>
-            <label htmlFor="email" className="mb-2 block font-mono text-xs text-zinc-400">EMAIL</label>
+            <label htmlFor="email" className="mb-1.5 block font-mono text-[10px] text-zinc-500">EMAIL</label>
             <input
               id="email"
               type="email"
@@ -58,11 +58,11 @@ export default function SignupPage() {
               required
               value={email}
               onChange={(event) => setEmail(event.target.value)}
-              className="w-full rounded border border-zinc-800 bg-[#08090a] px-3 py-2.5 text-sm text-white outline-none focus:border-emerald-600"
+              className="w-full rounded-md border border-zinc-800 bg-[#08090d] px-3 py-2 font-mono text-xs text-zinc-200 outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600"
             />
           </div>
           <div>
-            <label htmlFor="password" className="mb-2 block font-mono text-xs text-zinc-400">PASSWORD</label>
+            <label htmlFor="password" className="mb-1.5 block font-mono text-[10px] text-zinc-500">PASSWORD</label>
             <input
               id="password"
               type="password"
@@ -70,21 +70,21 @@ export default function SignupPage() {
               required
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              className="w-full rounded border border-zinc-800 bg-[#08090a] px-3 py-2.5 text-sm text-white outline-none focus:border-emerald-600"
+              className="w-full rounded-md border border-zinc-800 bg-[#08090d] px-3 py-2 font-mono text-xs text-zinc-200 outline-none focus:border-zinc-600 focus:ring-1 focus:ring-zinc-600"
             />
           </div>
           <button
             type="submit"
             disabled={submitting}
-            className="w-full rounded-md border border-emerald-700 bg-emerald-700 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-600 disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full rounded-md bg-zinc-100 py-2 text-xs font-medium text-zinc-950 shadow-sm transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
           >
             {submitting ? 'Creating account…' : 'Create Account'}
           </button>
         </form>
 
-        <p className="mt-6 border-t border-white/[0.08] pt-5 text-sm text-zinc-400">
+        <p className="mt-5 border-t border-zinc-800/80 pt-4 font-sans text-xs text-zinc-500">
           Already have an account?{' '}
-          <Link href="/login" className="text-emerald-400 hover:text-emerald-300">Sign in</Link>
+          <Link href="/login" className="hover:text-zinc-300">Sign in</Link>
         </p>
       </section>
     </main>

@@ -156,7 +156,7 @@ export default function SettingsPage() {
       </div>
 
       {error && <div role="alert" className="rounded border border-rose-900 bg-rose-950/40 px-4 py-3 text-sm text-rose-300">{error}</div>}
-      {notice && <div role="status" className="rounded border border-emerald-900 bg-emerald-950/30 px-4 py-3 text-sm text-emerald-300">{notice}</div>}
+      {notice && <div role="status" className="rounded border border-zinc-800 bg-zinc-900/50 px-4 py-3 text-sm text-zinc-300">{notice}</div>}
 
       <section className="rounded-md border border-white/[0.08] bg-[#0d0e12]">
         <div className="border-b border-white/[0.08] px-5 py-4">
@@ -198,7 +198,7 @@ export default function SettingsPage() {
               value={webhookUrl}
               onChange={(event) => setWebhookUrl(event.target.value)}
               placeholder="https://…"
-              className="w-full rounded border border-zinc-800 bg-[#08090a] px-3 py-2.5 font-mono text-xs text-white outline-none focus:border-zinc-600"
+              className="w-full rounded border border-zinc-800 bg-[#090a0f] px-3 py-2.5 font-mono text-xs text-white outline-none focus:border-zinc-600"
             />
           </div>
           <div className="flex flex-wrap gap-2">
@@ -215,7 +215,7 @@ export default function SettingsPage() {
         </form>
       </section>
 
-      <section className={`rounded-md border bg-[#0d0e12] ${tier === 'free' ? 'border-emerald-900/70' : 'border-white/[0.08]'}`}>
+      <section className="rounded-md border border-white/[0.08] bg-[#0d0e12]">
         <div className="flex flex-wrap items-center justify-between gap-5 p-5">
           <div>
             <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">Billing &amp; subscription</p>
@@ -230,7 +230,7 @@ export default function SettingsPage() {
             rel="noreferrer"
             className={`inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm ${
               tier === 'free'
-                ? 'border-emerald-700 bg-emerald-800 text-white hover:bg-emerald-700'
+                ? 'bg-zinc-100 text-zinc-950 shadow-sm hover:bg-white'
                 : 'border-zinc-700 text-zinc-200 hover:bg-zinc-900'
             }`}
           >

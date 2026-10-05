@@ -1,25 +1,19 @@
 import Link from 'next/link';
 import { ShieldAlert } from 'lucide-react';
 
-const links = [
-  { label: 'Documentation', href: '/docs' },
-  { label: 'Pricing', href: '/pricing' },
-];
-
 export function Navbar() {
   return (
-    <header className="border-b border-white/[0.08] bg-[#0a0b0e]">
-      <nav aria-label="Main navigation" className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:px-8">
-        <Link href="/" className="inline-flex items-center gap-2 text-sm font-semibold tracking-tight text-white">
-          <ShieldAlert aria-hidden="true" className="h-5 w-5 text-emerald-400" />
-          AI Circuit Breaker
+    <header className="sticky top-0 z-40 border-b border-zinc-800/80 bg-[#090a0f]/80 backdrop-blur-md">
+      <nav aria-label="Main navigation" className="mx-auto flex h-14 max-w-7xl items-center justify-between px-5 sm:px-8">
+        <Link href="/" className="inline-flex items-center gap-2 text-zinc-100">
+          <ShieldAlert aria-hidden="true" className="h-[22px] w-[22px] text-zinc-400" />
+          <span className="font-mono text-xs font-semibold tracking-tight">AI Circuit Breaker</span>
         </Link>
         <div className="flex items-center gap-4 sm:gap-6">
-          {links.map(({ label, href }) => (
-            <Link key={href} href={href} className="text-xs text-zinc-400 hover:text-white sm:text-sm">{label}</Link>
-          ))}
-          <Link href="/login" className="hidden text-xs text-zinc-400 hover:text-white sm:inline sm:text-sm">Sign in</Link>
-          <Link href="/signup" className="rounded-md border border-zinc-700 px-3 py-2 text-xs text-zinc-100 hover:bg-zinc-900 sm:text-sm">Create account</Link>
+          <Link href="/docs" className="text-xs text-zinc-400 hover:text-white">Docs</Link>
+          <Link href="/pricing" className="text-xs text-zinc-400 hover:text-white">Pricing</Link>
+          <Link href="/login" className="text-xs text-zinc-400 hover:text-white">Sign In</Link>
+          <Link href="/signup" className="rounded-md bg-zinc-100 px-3 py-1.5 text-xs font-medium text-zinc-950 transition hover:bg-white">Get API Key</Link>
         </div>
       </nav>
     </header>
@@ -28,14 +22,42 @@ export function Navbar() {
 
 export function Footer() {
   return (
-    <footer className="border-t border-white/[0.08] bg-[#0a0b0e]">
-      <div className="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-6 text-xs text-zinc-500 sm:flex-row sm:items-center sm:justify-between sm:px-8">
-        <Link href="/" className="font-mono text-zinc-400 hover:text-white">AI Circuit Breaker</Link>
-        <nav aria-label="Footer navigation" className="flex gap-5">
-          <Link href="/docs" className="hover:text-zinc-200">Documentation</Link>
-          <Link href="/pricing" className="hover:text-zinc-200">Pricing</Link>
-          <Link href="/login" className="hover:text-zinc-200">Sign in</Link>
-        </nav>
+    <footer className="border-t border-zinc-800/80 bg-[#090a0f]">
+      <div className="mx-auto grid max-w-7xl gap-7 px-5 py-7 sm:grid-cols-2 sm:px-8 lg:grid-cols-4">
+        <div>
+          <Link href="/" className="inline-flex items-center gap-2 font-mono text-xs font-semibold text-zinc-200">
+            <ShieldAlert aria-hidden="true" className="h-4 w-4 text-zinc-500" />
+            AI Circuit Breaker
+          </Link>
+          <p className="mt-2 max-w-xs text-[11px] leading-4 text-zinc-600">Request-loop detection and spend controls for OpenAI-compatible agent traffic.</p>
+        </div>
+        <div>
+          <h2 className="font-mono text-[10px] uppercase tracking-wider text-zinc-500">Service</h2>
+          <p className="mt-2 inline-flex items-center gap-2 text-xs text-zinc-400">
+            <span aria-hidden="true" className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+            Gateway status
+          </p>
+          <a href="mailto:contact.roandejager@gmail.com" className="mt-2 block text-xs text-zinc-500 hover:text-zinc-300">contact.roandejager@gmail.com</a>
+        </div>
+        <div>
+          <h2 className="font-mono text-[10px] uppercase tracking-wider text-zinc-500">Resources</h2>
+          <div className="mt-2 flex flex-col items-start gap-2 text-xs text-zinc-500">
+            <Link href="/docs" className="hover:text-zinc-300">Documentation</Link>
+            <Link href="/pricing" className="hover:text-zinc-300">Pricing</Link>
+            <a href="/llms.txt" className="hover:text-zinc-300">llms.txt</a>
+          </div>
+        </div>
+        <div>
+          <h2 className="font-mono text-[10px] uppercase tracking-wider text-zinc-500">Company</h2>
+          <div className="mt-2 flex flex-col items-start gap-2 text-xs text-zinc-500">
+            <a href="https://github.com/roandejager/circuit-breaker" target="_blank" rel="noreferrer" className="hover:text-zinc-300">GitHub ↗</a>
+            <Link href="/privacy" className="hover:text-zinc-300">Privacy</Link>
+            <Link href="/terms" className="hover:text-zinc-300">Terms</Link>
+          </div>
+        </div>
+      </div>
+      <div className="border-t border-zinc-800/80 px-5 py-3 text-center font-mono text-[10px] text-zinc-700 sm:px-8">
+        © {new Date().getFullYear()} AI Circuit Breaker
       </div>
     </footer>
   );

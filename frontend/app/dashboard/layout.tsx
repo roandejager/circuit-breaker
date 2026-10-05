@@ -105,10 +105,10 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   };
 
   const sidebar = (
-    <div className="flex h-full flex-col bg-[#0a0b0e]">
+    <div className="flex h-full flex-col bg-[#0b0d13]">
       <div className="flex h-16 items-center justify-between border-b border-white/[0.08] px-5">
         <Link href="/" className="flex min-w-0 items-center gap-2 text-sm font-semibold tracking-tight text-white" onClick={() => setMobileNavOpen(false)}>
-          <ShieldAlert aria-hidden="true" className="h-5 w-5 shrink-0 text-emerald-400" />
+          <ShieldAlert aria-hidden="true" className="h-5 w-5 shrink-0 text-zinc-400" />
           <span className="truncate">AI Circuit Breaker</span>
         </Link>
         <span className="ml-2 rounded border border-zinc-800 px-1.5 py-0.5 font-mono text-[10px] text-zinc-500">v0.1.0</span>
@@ -140,15 +140,14 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       <div className="border-t border-white/[0.08] p-4">
         <div className="mb-4 flex items-center gap-2 font-mono text-[11px] text-zinc-400">
           <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-50" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+            <span className="relative inline-flex h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
           </span>
           Frankfurt EU-Central Online
         </div>
         <p className="truncate text-xs text-zinc-300" title={user?.email ?? undefined}>{user?.email}</p>
         <span className={`mt-2 inline-flex rounded border px-2 py-1 font-mono text-[10px] tracking-wide ${
           tier === 'pro'
-            ? 'border-emerald-900 bg-emerald-950/40 text-emerald-300'
+            ? 'border-zinc-700 bg-zinc-900 text-zinc-300'
             : 'border-zinc-800 bg-zinc-900 text-zinc-400'
         }`}>
           {tier === 'pro' ? 'PRO TIER ACTIVE' : 'FREE TIER'}
@@ -167,7 +166,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
   if (loading || !user) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[#08090a] font-mono text-sm text-zinc-400">
+      <main className="flex min-h-screen items-center justify-center bg-[#090a0f] font-mono text-sm text-zinc-400">
         Checking your session…
       </main>
     );
@@ -175,7 +174,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
   return (
     <DashboardContext.Provider value={{ user, tier }}>
-      <div className="min-h-screen bg-[#08090a] text-zinc-100">
+      <div className="min-h-screen bg-[#090a0f] text-zinc-100">
         <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-white/[0.08] lg:block">
           {sidebar}
         </aside>
@@ -203,7 +202,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         )}
 
         <div className="lg:pl-64">
-          <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-white/[0.08] bg-[#0a0b0e] px-4 sm:px-6">
+          <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-white/[0.08] bg-[#0b0d13] px-4 sm:px-6">
             <div className="flex min-w-0 items-center gap-3">
               <button
                 type="button"

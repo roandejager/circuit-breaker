@@ -129,7 +129,7 @@ export default function ApiKeysPage() {
         <button
           type="button"
           onClick={() => { setModalOpen(true); setError(''); setNewKey(''); }}
-          className="inline-flex items-center gap-2 rounded-md border border-emerald-800 bg-emerald-950/50 px-3 py-2 text-sm text-emerald-300 hover:bg-emerald-950"
+          className="inline-flex items-center gap-2 rounded-md bg-zinc-100 px-3 py-2 text-xs font-medium text-zinc-950 shadow-sm transition hover:bg-white"
         >
           <Plus aria-hidden="true" className="h-4 w-4" />
           Provision Protected Key
@@ -137,7 +137,7 @@ export default function ApiKeysPage() {
       </div>
 
       {error && <div role="alert" className="rounded border border-rose-900 bg-rose-950/40 px-4 py-3 text-sm text-rose-300">{error}</div>}
-      {notice && <div role="status" className="rounded border border-emerald-900 bg-emerald-950/30 px-4 py-3 text-sm text-emerald-300">{notice}</div>}
+      {notice && <div role="status" className="rounded border border-zinc-800 bg-zinc-900/50 px-4 py-3 text-sm text-zinc-300">{notice}</div>}
 
       <section className="overflow-hidden rounded-md border border-white/[0.08] bg-[#0d0e12]">
         <div className="flex items-center justify-between border-b border-white/[0.08] px-4 py-3">
@@ -164,8 +164,8 @@ export default function ApiKeysPage() {
                 <tr key={key.id} className="hover:bg-zinc-900/50">
                   <td className="px-4 py-3 font-mono text-zinc-200">{key.key_prefix}</td>
                   <td className="px-4 py-3">
-                    <span className={`inline-flex items-center gap-2 font-mono ${key.is_active ? 'text-emerald-400' : 'text-zinc-500'}`}>
-                      <span className={`h-1.5 w-1.5 rounded-full ${key.is_active ? 'bg-emerald-500' : 'bg-zinc-600'}`} />
+                    <span className="inline-flex items-center gap-2 font-mono text-zinc-400">
+                      <span className="h-1.5 w-1.5 rounded-full bg-zinc-500" />
                       {key.is_active ? 'Active' : 'Inactive'}
                     </span>
                   </td>
@@ -213,7 +213,7 @@ export default function ApiKeysPage() {
                     <AlertTriangle aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0" />
                     Copy this key now. For security, the full value is shown only once and cannot be retrieved later.
                   </div>
-                  <div className="flex items-center gap-2 rounded border border-zinc-800 bg-[#08090a] p-3">
+                  <div className="flex items-center gap-2 rounded border border-zinc-800 bg-[#090a0f] p-3">
                     <code className="min-w-0 flex-1 break-all font-mono text-xs text-zinc-200">{newKey}</code>
                     <button type="button" onClick={() => void copyNewKey()} className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-zinc-700 px-2.5 py-2 text-xs text-zinc-200 hover:bg-zinc-900">
                       {copied ? <Check aria-hidden="true" className="h-3.5 w-3.5" /> : <Copy aria-hidden="true" className="h-3.5 w-3.5" />}
@@ -224,7 +224,7 @@ export default function ApiKeysPage() {
                 </div>
               ) : (
                 <>
-                  <div className="flex gap-2 rounded border border-emerald-900/70 bg-emerald-950/25 p-3 text-xs leading-5 text-emerald-200">
+                  <div className="flex gap-2 rounded border border-zinc-800 bg-zinc-900/50 p-3 text-xs leading-5 text-zinc-300">
                     <ShieldCheck aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0" />
                     Encrypted with AES-256 (Fernet) prior to database insertion. Raw keys are never logged or exposed in plaintext.
                   </div>
@@ -240,10 +240,10 @@ export default function ApiKeysPage() {
                         value={upstreamKey}
                         onChange={(event) => setUpstreamKey(event.target.value)}
                         placeholder="sk-proj-…"
-                        className="w-full rounded border border-zinc-800 bg-[#08090a] px-3 py-2.5 font-mono text-xs text-white outline-none focus:border-emerald-700"
+                        className="w-full rounded border border-zinc-800 bg-[#090a0f] px-3 py-2.5 font-mono text-xs text-white outline-none focus:border-zinc-600"
                       />
                     </div>
-                    <button type="submit" disabled={submitting} className="rounded-md border border-emerald-800 bg-emerald-950/50 px-3 py-2 text-sm text-emerald-300 hover:bg-emerald-950 disabled:opacity-50">
+                    <button type="submit" disabled={submitting} className="rounded-md bg-zinc-100 px-3 py-2 text-xs font-medium text-zinc-950 shadow-sm transition hover:bg-white disabled:opacity-50">
                       {submitting ? 'Provisioning…' : 'Provision Protected Key'}
                     </button>
                   </form>

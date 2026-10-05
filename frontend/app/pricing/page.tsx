@@ -28,7 +28,7 @@ const proFeatures = [
 
 export default function PricingPage() {
   return (
-    <main className="min-h-screen bg-[#08090a] text-zinc-100">
+    <main className="min-h-screen bg-[#090a0f]/90 text-zinc-100">
       <Navbar />
       <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
         <nav aria-label="Breadcrumb" className="font-mono text-xs text-zinc-500">
@@ -37,9 +37,9 @@ export default function PricingPage() {
           <span aria-current="page" className="text-zinc-300">Pricing</span>
         </nav>
         <header className="max-w-3xl py-12">
-          <p className="font-mono text-xs uppercase tracking-widest text-emerald-400">Pricing</p>
-          <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-5xl">Limits that match your workload.</h1>
-          <p className="mt-4 text-base leading-7 text-zinc-400">Start without a subscription and move to production controls when you need higher ceilings.</p>
+          <p className="font-mono text-[11px] text-zinc-500">GATEWAY // PRICING &amp; LIMITS</p>
+          <h1 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Limits that match your workload.</h1>
+          <p className="mt-3 text-xs leading-5 text-zinc-400">Start without a subscription and move to production controls when you need higher ceilings.</p>
         </header>
 
         <LoopSavingsCalculator />
@@ -55,7 +55,7 @@ export default function PricingPage() {
             <ul className="flex-1 space-y-3 p-5 sm:p-6">
               {freeFeatures.map((feature) => (
                 <li key={feature} className="flex gap-2 text-sm text-zinc-300">
-                  <Check aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />{feature}
+                  <Check aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-zinc-500" />{feature}
                 </li>
               ))}
             </ul>
@@ -66,9 +66,9 @@ export default function PricingPage() {
             </div>
           </article>
 
-          <article className="flex flex-col rounded-md border border-emerald-800/70 bg-[#0d0e12]">
+          <article className="flex flex-col rounded-md border border-white/[0.08] bg-[#0d0e12]">
             <div className="border-b border-white/[0.08] p-5 sm:p-6">
-              <p className="font-mono text-xs uppercase tracking-widest text-emerald-400">Production</p>
+              <p className="font-mono text-xs uppercase tracking-widest text-zinc-500">Production</p>
               <h2 className="mt-2 text-xl font-semibold text-white">Pro</h2>
               <p className="mt-4 font-mono text-3xl text-white">$29<span className="ml-1 text-sm text-zinc-500">/mo</span></p>
               <p className="mt-2 text-sm text-zinc-400">For production agents that need higher budget ceilings.</p>
@@ -76,12 +76,12 @@ export default function PricingPage() {
             <ul className="flex-1 space-y-3 p-5 sm:p-6">
               {proFeatures.map((feature) => (
                 <li key={feature} className="flex gap-2 text-sm text-zinc-300">
-                  <Check aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" />{feature}
+                  <Check aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-zinc-500" />{feature}
                 </li>
               ))}
             </ul>
             <div className="p-5 pt-0 sm:p-6 sm:pt-0">
-              <a href={polarCheckoutUrl} target="_blank" rel="noreferrer" className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-emerald-600 bg-emerald-600 px-4 py-2.5 text-sm font-medium text-zinc-950 hover:bg-emerald-500">
+              <a href={polarCheckoutUrl} target="_blank" rel="noreferrer" className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-zinc-100 px-4 py-2 text-xs font-medium text-zinc-950 shadow-sm transition hover:bg-white">
                 Upgrade to Pro ($29/mo) <ArrowRight aria-hidden="true" className="h-4 w-4" />
               </a>
             </div>
