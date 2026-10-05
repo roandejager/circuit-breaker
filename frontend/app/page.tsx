@@ -165,12 +165,20 @@ export default function Home() {
     setKeyError('');
 
     try {
+      // Retrieve cryptographically signed JWT token from Supabase session
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('You must be logged in to create an API key.');
+      }
+
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
       const response = await fetch(`${backendUrl}/v1/keys/create`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
         body: JSON.stringify({
-          user_id: user.id,
           upstream_key: upstreamKey
         })
       });
@@ -338,7 +346,6 @@ export default function Home() {
       </header>
 
       <div className="max-w-6xl mx-auto w-full px-6 py-8 flex-1 space-y-8">
-        {/* Monetization Banner (Hides if already Pro) */}
         {!isPro ? (
           <div className="bg-gradient-to-r from-emerald-950/40 via-zinc-900 to-zinc-900 border border-emerald-800/50 rounded-xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
@@ -368,7 +375,6 @@ export default function Home() {
           </div>
         )}
 
-        {/* Live Metrics Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-zinc-900/60 border border-zinc-800/80 rounded-lg p-5">
             <div className="flex items-center justify-between text-zinc-400 mb-2">
@@ -409,7 +415,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* API Key Generation & Drop-In Code */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="bg-zinc-900/60 border border-zinc-800/80 rounded-lg p-6 space-y-4">
             <div className="flex items-center space-x-2">
