@@ -22,7 +22,7 @@ export function TerminalSimulator() {
   const reset = () => setRequests([]);
 
   return (
-    <div className="h-[260px] overflow-hidden rounded-md border border-zinc-800 bg-[#0b0d13]">
+    <div className="h-[260px] overflow-hidden rounded-md border border-zinc-800 bg-[#0e1016] shadow-2xl shadow-black/80 transition duration-300 hover:border-white/[0.16]">
       <div className="flex h-10 items-center justify-between border-b border-zinc-800 px-4">
         <div className="flex items-center gap-2">
           <span className="h-1.5 w-1.5 rounded-full bg-zinc-700" />
@@ -30,10 +30,10 @@ export function TerminalSimulator() {
           <span className="h-1.5 w-1.5 rounded-full bg-zinc-700" />
           <span className="ml-2 font-mono text-[11px] text-zinc-500">gateway-simulation.log</span>
         </div>
-        <span className="font-mono text-[10px] uppercase tracking-wide text-zinc-600">Local demonstration</span>
+        <span className="rounded border border-zinc-800 bg-[#08090c] px-2 py-1 font-mono text-[9px] uppercase tracking-wide text-zinc-500">SIMULATED GATEWAY</span>
       </div>
       <div className="grid h-[calc(100%-64px)] gap-3 p-4 sm:grid-cols-[1fr_auto] sm:items-end">
-        <div aria-live="polite" className="min-h-0 space-y-2 overflow-auto font-mono text-xs leading-5">
+        <div aria-live="polite" className="min-h-0 space-y-1 overflow-auto font-mono text-xs leading-4">
           <p className="text-zinc-600">$ agent.run --task &quot;insert order&quot;</p>
           {requests.map((requestNumber, index) => {
             const stage = stages[index];

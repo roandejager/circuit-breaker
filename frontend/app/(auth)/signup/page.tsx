@@ -30,8 +30,9 @@ export default function SignupPage() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#090a0f]/90 px-4 py-10 text-zinc-100">
-      <section className="w-full max-w-[360px] rounded-lg border border-zinc-800/80 bg-[#0d0f14] p-6 shadow-2xl">
+    <main className="relative isolate flex min-h-screen items-center justify-center overflow-hidden bg-[#08090c] px-4 py-10 text-zinc-100">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(16,185,129,0.08),transparent_70%)]" />
+      <section className="w-full max-w-[360px] rounded-lg border border-zinc-800/80 bg-[#0e1016] p-6 shadow-2xl transition duration-300 hover:border-white/[0.16]">
         <Link href="/" className="mb-6 inline-flex items-center gap-2.5 text-zinc-100">
           <ShieldAlert aria-hidden="true" className="h-6 w-6 text-zinc-400" />
           <span className="font-mono text-xs font-semibold tracking-tight">AI Circuit Breaker</span>
