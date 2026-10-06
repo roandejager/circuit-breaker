@@ -1,5 +1,6 @@
 import json
 import logging
+import time
 from typing import AsyncGenerator
 from fastapi import APIRouter, Request, Response, BackgroundTasks
 from fastapi.responses import JSONResponse, StreamingResponse
@@ -13,6 +14,24 @@ from app.services.db import db_service
 router = APIRouter()
 logger = logging.getLogger("circuit_breaker")
 logging.basicConfig(level=logging.INFO)
+
+
+async def graceful_stop_stream(model: str, warning_message: str) -> AsyncGenerator[bytes, None]:
+    """Yield a single OpenAI-compatible stop chunk followed by the SSE terminator."""
+    created = int(time.time())
+    chunk = {
+        "id": f"chatcmpl-breaker-{created}",
+        "object": "chat.completion.chunk",
+        "created": created,
+        "model": model,
+        "choices": [{
+            "index": 0,
+            "delta": {"role": "assistant", "content": warning_message},
+            "finish_reason": "stop",
+        }],
+    }
+    yield f"data: {json.dumps(chunk)}\n\n".encode("utf-8")
+    yield b"data: [DONE]\n\n"
 
 
 async def sse_stream_generator(
@@ -145,10 +164,16 @@ async def chat_completions_proxy(request: Request, background_tasks: BackgroundT
             content={"error": {"message": reason, "type": "circuit_breaker_budget_exceeded", "code": "budget_limit_breached"}}
         )
 
+    input_tokens = cost_engine.count_tokens_from_messages(messages, model=model)
+
     # 3. CIRCUIT BREAKER CHECK: Infinite Loop Detection
     is_loop, loop_reason = loop_detector.check_and_record(session_id=session_id, messages=messages)
     if is_loop:
         logger.warning(f"[CIRCUIT BREAKER] Infinite loop caught for user {user_id}. {loop_reason}")
+        warning_message = (
+            "⚡ [CIRCUIT BREAKER ALERT]: Autonomous agent execution halted. "
+            f"{loop_reason} Stream terminated to prevent runaway API spend."
+        )
 
         background_tasks.add_task(
             db_service.log_request,
@@ -156,20 +181,43 @@ async def chat_completions_proxy(request: Request, background_tasks: BackgroundT
             api_key_id=api_key_id,
             session_id=session_id,
             model=model,
-            input_tokens=0,
+            input_tokens=input_tokens,
             output_tokens=0,
             cost_usd=0.0,
             status_code=400,
             was_blocked=True,
             blocked_reason=loop_reason
         )
-        return JSONResponse(
-            status_code=400,
-            content={"error": {"message": loop_reason, "type": "circuit_breaker_loop_detected", "code": "infinite_loop_killed"}}
-        )
 
-    # Calculate input tokens for spend tracking
-    input_tokens = cost_engine.count_tokens_from_messages(messages, model=model)
+        if is_stream:
+            return StreamingResponse(
+                graceful_stop_stream(model, warning_message),
+                media_type="text/event-stream",
+                background=background_tasks,
+            )
+
+        created = int(time.time())
+        return JSONResponse(
+            status_code=200,
+            content={
+                "id": f"chatcmpl-breaker-{created}",
+                "object": "chat.completion",
+                "created": created,
+                "model": model,
+                "choices": [{
+                    "index": 0,
+                    "message": {"role": "assistant", "content": warning_message},
+                    "finish_reason": "stop",
+                }],
+                "usage": {
+                    "prompt_tokens": input_tokens,
+                    "completion_tokens": 0,
+                    "total_tokens": input_tokens,
+                },
+                "circuit_breaker": {"triggered": True, "reason": loop_reason},
+            },
+            background=background_tasks,
+        )
 
     # 4. FORWARD TO UPSTREAM OPENAI USING DECRYPTED USER KEY
     upstream_url = f"{settings.UPSTREAM_OPENAI_BASE_URL.rstrip('/')}/chat/completions"

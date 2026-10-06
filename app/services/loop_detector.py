@@ -1,8 +1,9 @@
 import hashlib
 import json
+import re
 import time
 from collections import deque
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Mapping, Optional, Tuple
 
 
 class LoopDetector:
@@ -16,21 +17,56 @@ class LoopDetector:
 
     def _normalize_and_hash(self, messages: List[dict]) -> str:
         """
-        Creates a deterministic hash of the last message and tool results
-        to detect recursive agent behavior.
+        Hashes the stable parts of the latest message, ignoring framework metadata
+        that changes between retries.
         """
         if not messages:
             return ""
 
-        # Focus on the most recent conversation state
         latest_message = messages[-1]
-        
-        # Canonical representation of the latest payload
-        content = latest_message.get("content", "")
-        role = latest_message.get("role", "")
-        tool_calls = latest_message.get("tool_calls", "")
-        
-        payload = f"{role}:{content}:{tool_calls}".strip().lower()
+
+        tool_calls = latest_message.get("tool_calls")
+        if tool_calls:
+            canonical_calls = []
+            for tool_call in tool_calls:
+                function = tool_call.get("function", {})
+                name = str(function.get("name", ""))
+                arguments = function.get("arguments", "")
+                if isinstance(arguments, str):
+                    try:
+                        arguments = json.loads(arguments)
+                    except json.JSONDecodeError:
+                        pass
+                if isinstance(arguments, (dict, list)):
+                    arguments = json.dumps(arguments, sort_keys=True, separators=(",", ":"))
+                canonical_calls.append((name, str(arguments)))
+
+            canonical_calls.sort(key=lambda call: call[0])
+            payload = "tool_calls:[" + ",".join(
+                f"{name}:{arguments}" for name, arguments in canonical_calls
+            ) + "]"
+        else:
+            role = str(latest_message.get("role", "")).strip().lower()
+            content = latest_message.get("content", "")
+            if not isinstance(content, str):
+                content = json.dumps(content, sort_keys=True, separators=(",", ":"))
+
+            if role != "tool":
+                content = re.sub(
+                    r"^(step|turn|iteration)\s*\d+[:\-]?\s*",
+                    "",
+                    content,
+                    flags=re.IGNORECASE,
+                )
+                content = re.sub(
+                    r"\d{4}-\d{2}-\d{2}[T\s]\d{2}:\d{2}:\d{2}(?:\.\d+)?Z?",
+                    "",
+                    content,
+                )
+
+            normalized_content = re.sub(r"\s+", " ", content).strip().lower()
+            payload = f"{role}:{normalized_content}"
+
         return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
     def _clean_expired_entries(self, session_id: str, current_time: float) -> None:
@@ -107,5 +143,63 @@ if __name__ == "__main__":
     is_loop, reason = detector.check_and_record(test_session, step3)
     assert is_loop, "Step 3 must trigger the breaker."
 
+    tool_call_with_id_a = [{
+        "role": "assistant",
+        "tool_calls": [{
+            "id": "call_abc123",
+            "type": "function",
+            "function": {
+                "name": "query_database",
+                "arguments": '{"table":"users","limit":10}',
+            },
+        }],
+    }]
+    tool_call_with_id_b = [{
+        "role": "assistant",
+        "tool_calls": [{
+            "id": "call_xyz789",
+            "type": "function",
+            "function": {
+                "name": "query_database",
+                "arguments": '{"limit":10,"table":"users"}',
+            },
+        }],
+    }]
+    assert (
+        detector._normalize_and_hash(tool_call_with_id_a)
+        == detector._normalize_and_hash(tool_call_with_id_b)
+    ), "Tool-call IDs and JSON key order must not change the hash."
+
+    tool_detector = LoopDetector(window_size=5, repetition_threshold=3)
+    assert not tool_detector.check_and_record("tool_session", tool_call_with_id_a)[0]
+    assert not tool_detector.check_and_record("tool_session", tool_call_with_id_b)[0]
+    tool_call_with_id_c = [{
+        "role": "assistant",
+        "tool_calls": [{
+            "id": "call_new_id",
+            "type": "function",
+            "function": {
+                "name": "query_database",
+                "arguments": '{"table": "users", "limit": 10}',
+            },
+        }],
+    }]
+    is_tool_loop, _ = tool_detector.check_and_record("tool_session", tool_call_with_id_c)
+    assert is_tool_loop, "Equivalent tool calls with changing IDs must trip the loop detector."
+
+    dynamic_prefix_a = [{
+        "role": "assistant",
+        "content": "Step 3: 2026-10-06T14:18:29.335Z Retry the same request",
+    }]
+    dynamic_prefix_b = [{
+        "role": "assistant",
+        "content": "Turn 4: 2026-10-06 14:18:29.335 Retry the same request",
+    }]
+    assert (
+        detector._normalize_and_hash(dynamic_prefix_a)
+        == detector._normalize_and_hash(dynamic_prefix_b)
+    ), "Step counters and ISO timestamps must not change the hash."
+
     print("ALL TESTS PASSED:")
     print(f"Breaker tripped successfully: {reason}")
+    print("Tool-call IDs, JSON key order, step counters, and timestamps normalize consistently.")
