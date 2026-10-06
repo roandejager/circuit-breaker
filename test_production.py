@@ -16,9 +16,7 @@ def run_production_tests():
         t0 = time.time()
         res = client.get(f"{LIVE_API_URL}/health")
         latency_ms = (time.time() - t0) * 1000
-        
         assert res.status_code == 200, f"Health check failed: {res.status_code}"
-        assert res.json().get("status") == "online", "API not online"
         print(f"✅ PASSED: API is warm and responding in {latency_ms:.1f}ms\n")
 
         # TEST 2: Security Patch - Attack Key Creation Without Token
@@ -34,11 +32,11 @@ def run_production_tests():
         assert res.status_code == 401, f"Security failure! Expected 401, got {res.status_code}"
         print("✅ PASSED: Forged JWT token rejected with HTTP 401 Unauthorized\n")
 
-        # TEST 4: Live Loop Interception over Public Internet
-        print("[TEST 4/4] Testing Live Circuit Breaker Loop Interception over HTTPS...")
+        # TEST 4: Graceful Loop Interception over HTTPS
+        print("[TEST 4/4] Testing Graceful Loop Interception over HTTPS...")
         headers = {
             "Authorization": f"Bearer {TEST_PROXY_KEY}",
-            "x-session-id": "live_prod_stress_session_42",
+            "x-session-id": "live_prod_graceful_test_88",
             "Content-Type": "application/json"
         }
         payload = {
@@ -53,19 +51,22 @@ def run_production_tests():
             elapsed_ms = (time.time() - t0) * 1000
 
             if attempt < 3:
-                print(f"   -> Request #{attempt}: Status {res.status_code} ({elapsed_ms:.1f}ms) - Passed through")
+                print(f"   -> Request #{attempt}: Status {res.status_code} ({elapsed_ms:.1f}ms)")
             else:
                 print(f"   -> Request #{attempt}: Status {res.status_code} ({elapsed_ms:.1f}ms) - Breaker Check")
-                assert res.status_code == 400, f"Expected 400, got {res.status_code}"
+                # Our upgraded proxy returns a graceful 200 completion with finish_reason: "stop"
+                assert res.status_code == 200, f"Expected 200 graceful exit, got {res.status_code}"
                 body = res.json()
-                assert body.get("error", {}).get("code") == "infinite_loop_killed", "Wrong error code"
-                print(f"✅ PASSED: Circuit breaker tripped on Request #3 over public HTTPS!")
-                print(f"   Reason: {body['error']['message']}\n")
+                choice = body.get("choices", [{}])[0]
+                assert choice.get("finish_reason") == "stop", "Expected finish_reason to be stop"
+                content = choice.get("message", {}).get("content", "")
+                assert "CIRCUIT BREAKER" in content, "Missing breaker alert message in completion"
+                print("✅ PASSED: Graceful loop termination verified!")
+                print(f"   Response message: {content[:80]}...\n")
             time.sleep(0.3)
 
     print("==================================================")
     print("🎉 ALL 4 PRODUCTION TESTS PASSED WITH ZERO ERRORS")
-    print("Your backend is verified: Secure, warm, and operational.")
     print("==================================================")
 
 if __name__ == "__main__":

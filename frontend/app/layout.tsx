@@ -14,7 +14,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className="min-h-screen bg-[#090a0f] bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:32px_32px] text-zinc-200 antialiased selection:bg-zinc-600 selection:text-white">
+      <body className="antialiased">
         {children}
         <Analytics />
       </body>
