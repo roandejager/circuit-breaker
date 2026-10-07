@@ -5,6 +5,7 @@ import { CodeTabs } from '@/components/CodeTabs';
 import { CopyButton } from '@/components/CopyButton';
 import { Footer, Navbar } from '@/components/Navigation';
 import { TerminalSimulator } from '@/components/TerminalSimulator';
+import { TrustSection } from '@/components/TrustSection';
 
 export const metadata: Metadata = {
   title: 'AI Circuit Breaker | LLM Cost Firewall',
@@ -67,24 +68,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section aria-labelledby="simulator-title" className="mx-auto max-w-7xl px-5 py-4 sm:px-8">
-        <div className="mb-3 flex items-end justify-between gap-4">
-          <div>
-            <p className="font-mono text-[11px] text-zinc-500">INTERACTIVE REQUEST SIMULATION</p>
-            <h2 id="simulator-title" className="mt-1 text-sm font-medium text-zinc-200">Loop detection trace</h2>
-          </div>
-          <Link href="/docs#errors" className="text-xs text-zinc-500 hover:text-zinc-300">Protocol reference →</Link>
-        </div>
-        <TerminalSimulator />
-      </section>
-
-      <section className="mx-auto max-w-7xl px-5 py-6 sm:px-8">
-        <div className="mb-3">
-          <p className="font-mono text-[11px] text-zinc-500">CLIENT CONFIGURATION</p>
-          <h2 className="mt-1 text-sm font-medium text-zinc-200">Change the base URL. Keep the SDK.</h2>
-        </div>
-        <CodeTabs />
-      </section>
+      <TrustSection />
 
       <section className="mx-auto max-w-7xl px-5 py-7 sm:px-8">
         <div className="mb-4 border-b border-zinc-800/80 pb-3">
@@ -180,6 +164,25 @@ export default function HomePage() {
           </article>
         </div>
         <p className="mt-3 text-[10px] text-zinc-600">Performance figures are engineering targets and depend on deployment, network conditions, and request profile.</p>
+      </section>
+
+      <section aria-labelledby="simulator-title" className="mx-auto max-w-7xl px-5 py-4 sm:px-8">
+        <div className="mb-3 flex items-end justify-between gap-4">
+          <div>
+            <p className="font-mono text-[11px] text-zinc-500">INTERACTIVE REQUEST SIMULATION</p>
+            <h2 id="simulator-title" className="mt-1 text-sm font-medium text-zinc-200">Loop detection trace</h2>
+          </div>
+          <Link href="/docs#errors" className="text-xs text-zinc-500 hover:text-zinc-300">Protocol reference →</Link>
+        </div>
+        <TerminalSimulator />
+      </section>
+
+      <section className="mx-auto max-w-7xl px-5 py-6 sm:px-8">
+        <div className="mb-3">
+          <p className="font-mono text-[11px] text-zinc-500">CLIENT CONFIGURATION</p>
+          <h2 className="mt-1 text-sm font-medium text-zinc-200">Change the base URL. Keep the SDK.</h2>
+        </div>
+        <CodeTabs />
       </section>
 
       <section className="mx-auto max-w-7xl px-5 pb-9 pt-2 sm:px-8">
