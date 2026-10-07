@@ -34,14 +34,13 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="relative isolate flex min-h-screen items-center justify-center overflow-hidden bg-[#08090c] px-4 py-10 text-zinc-100">
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(16,185,129,0.08),transparent_70%)]" />
-      <section className="w-full max-w-[360px] rounded-lg border border-zinc-800/80 bg-[#0e1016] p-6 shadow-2xl transition duration-300 hover:border-white/[0.16]">
+    <main className="relative isolate flex min-h-screen items-center justify-center overflow-hidden bg-[#0a0a0a] px-4 py-10 text-zinc-100">
+      <section className="w-full max-w-[360px] rounded-lg border border-zinc-800/80 bg-[#0e1016] p-6 shadow-2xl transition-colors hover:border-sky-500/40">
         <Link href="/" className="mb-6 inline-flex items-center gap-2.5 text-zinc-100">
-          <ShieldAlert aria-hidden="true" className="h-6 w-6 text-zinc-400" />
-          <span className="font-mono text-xs font-semibold tracking-tight">AI Circuit Breaker</span>
+          <ShieldAlert aria-hidden="true" className="h-6 w-6 text-sky-400" />
+          <span className="font-mono text-xs font-semibold tracking-tight">Shunt</span>
         </Link>
-        <h1 className="text-lg font-semibold tracking-tight text-white">Sign in to Gateway</h1>
+        <h1 className="text-lg font-semibold tracking-tight text-white">Sign in to Shunt</h1>
         <p className="mt-1.5 text-xs text-zinc-500">Authenticate to manage protected API keys.</p>
 
         {error && (

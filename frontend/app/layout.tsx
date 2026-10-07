@@ -3,8 +3,8 @@ import "./globals.css";
 import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
-  title: "AI Circuit Breaker | LLM Loop & Cost Firewall",
-  description: "Drop-in reverse proxy that stops runaway infinite loops and budget overruns in autonomous AI agents with one line of code.",
+  title: "Shunt | The In-Memory LLM Firewall",
+  description: "Shunt is an in-memory LLM firewall that stops recursive agent loops and enforces spend caps without retaining prompt payloads.",
 };
 
 export default function RootLayout({

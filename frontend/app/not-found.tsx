@@ -3,11 +3,11 @@ import { ArrowLeft, Terminal } from 'lucide-react';
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-[#090a0f] text-zinc-300 font-mono flex flex-col items-center justify-center px-6 selection:bg-zinc-800 selection:text-white">
+    <div className="min-h-screen bg-[#0a0a0a] text-zinc-300 font-mono flex flex-col items-center justify-center px-6 selection:bg-zinc-800 selection:text-white">
       <div className="max-w-md w-full border border-zinc-800 bg-zinc-950 p-8 rounded-lg space-y-6">
         <div className="flex items-center space-x-2 text-zinc-500 text-xs border-b border-zinc-800 pb-3">
           <Terminal className="w-4 h-4 text-zinc-500" />
-          <span>GATEWAY ERROR // 404</span>
+          <span>SHUNT ERROR // 404</span>
         </div>
 
         <div>

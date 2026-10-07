@@ -1,8 +1,8 @@
-# AI Circuit Breaker
+# Shunt
 
-> The Zero-Overhead Reverse Proxy & Infinite-Loop Firewall for Autonomous AI Agents.
+> The In-Memory LLM Firewall.
 
-AI Circuit Breaker intercepts chat completion calls to upstream providers (OpenAI, Anthropic), detects recursive agent error loops using a sliding-window SHA-256 hash deque, and kills runaway streams before budget exhaustion.
+Shunt intercepts chat completion calls to upstream providers (OpenAI, Anthropic), detects recursive agent error loops using a sliding-window SHA-256 hash deque, and stops runaway streams before budget exhaustion.
 
 ## Quickstart Drop-in
 - Base URL: https://circuit-breaker-api.onrender.com/v1

@@ -1,7 +1,7 @@
 'use client';
 
 import { FormEvent, useCallback, useEffect, useState } from 'react';
-import { AlertTriangle, Check, Copy, KeyRound, Plus, RefreshCw, ShieldCheck, Trash2, X } from 'lucide-react';
+import { AlertTriangle, Check, Copy, KeyRound, Plus, RefreshCw, Trash2, X } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
 import { useDashboardContext } from '../dashboard-context';
 
@@ -17,6 +17,8 @@ interface CreateKeyResponse {
   key_prefix?: unknown;
 }
 
+type CredentialMode = 'zero-trust' | 'vault';
+
 const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://circuit-breaker-api.onrender.com';
 
 export default function ApiKeysPage() {
@@ -24,6 +26,7 @@ export default function ApiKeysPage() {
   const [keys, setKeys] = useState<ApiKey[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
+  const [credentialMode, setCredentialMode] = useState<CredentialMode>('zero-trust');
   const [upstreamKey, setUpstreamKey] = useState('');
   const [newKey, setNewKey] = useState('');
   const [copied, setCopied] = useState(false);
@@ -68,7 +71,7 @@ export default function ApiKeysPage() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify({ upstream_key: upstreamKey }),
+        body: JSON.stringify(credentialMode === 'vault' ? { upstream_key: upstreamKey.trim() } : {}),
       });
       const payload: CreateKeyResponse & { detail?: string } = await response.json();
       if (!response.ok) throw new Error(payload.detail || `Key provisioning failed (${response.status}).`);
@@ -78,7 +81,8 @@ export default function ApiKeysPage() {
 
       setNewKey(payload.proxy_key);
       setUpstreamKey('');
-      setNotice('Protected key provisioned. Copy it now; it will not be shown again.');
+      setCredentialMode('zero-trust');
+      setNotice('Gateway key provisioned. Copy it now; it will not be shown again.');
       await loadKeys();
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : 'Unable to provision key.');
@@ -123,16 +127,16 @@ export default function ApiKeysPage() {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="font-mono text-xs uppercase tracking-widest text-zinc-500">Gateway credentials</p>
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-white">API keys</h1>
-          <p className="mt-2 text-sm text-zinc-400">Create protected keys for routing requests through the gateway.</p>
+          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-white">Shunt API keys</h1>
+          <p className="mt-2 text-sm text-zinc-400">Create gateway keys for requests using stored credentials or a per-request upstream-key header.</p>
         </div>
         <button
           type="button"
-          onClick={() => { setModalOpen(true); setError(''); setNewKey(''); }}
+          onClick={() => { setModalOpen(true); setCredentialMode('zero-trust'); setUpstreamKey(''); setError(''); setNewKey(''); }}
           className="inline-flex items-center gap-2 rounded-md bg-zinc-100 px-3 py-2 text-xs font-medium text-zinc-950 shadow-sm transition hover:bg-white"
         >
           <Plus aria-hidden="true" className="h-4 w-4" />
-          Provision Protected Key
+          Generate Shunt Key
         </button>
       </div>
 
@@ -164,8 +168,8 @@ export default function ApiKeysPage() {
                 <tr key={key.id} className="hover:bg-zinc-900/50">
                   <td className="px-4 py-3 font-mono text-zinc-200">{key.key_prefix}</td>
                   <td className="px-4 py-3">
-                    <span className="inline-flex items-center gap-2 font-mono text-zinc-400">
-                      <span className="h-1.5 w-1.5 rounded-full bg-zinc-500" />
+                    <span className={`inline-flex items-center gap-2 rounded border px-2 py-1 font-mono ${key.is_active ? 'border-sky-500/20 bg-sky-500/10 text-sky-400' : 'border-zinc-800 text-zinc-500'}`}>
+                      <span className={`h-1.5 w-1.5 rounded-full ${key.is_active ? 'bg-sky-400 shadow-[0_0_8px_#38BDF8]' : 'bg-zinc-500'}`} />
                       {key.is_active ? 'Active' : 'Inactive'}
                     </span>
                   </td>
@@ -198,8 +202,8 @@ export default function ApiKeysPage() {
           <section role="dialog" aria-modal="true" aria-labelledby="provision-title" className="w-full max-w-xl rounded-md border border-zinc-800 bg-[#0d0e12] shadow-2xl">
             <div className="flex items-center justify-between border-b border-white/[0.08] px-5 py-4">
               <div>
-                <h2 id="provision-title" className="text-base font-semibold text-white">Provision protected key</h2>
-                <p className="mt-1 text-xs text-zinc-500">Create a gateway key bound to your upstream provider credential.</p>
+                <h2 id="provision-title" className="text-base font-semibold text-white">Generate Shunt Key</h2>
+                <p className="mt-1 text-xs text-zinc-500">Choose how Shunt receives your upstream OpenAI credential.</p>
               </div>
               <button type="button" onClick={() => setModalOpen(false)} aria-label="Close provision form" className="rounded-md p-1.5 text-zinc-500 hover:bg-zinc-900 hover:text-white">
                 <X aria-hidden="true" className="h-4 w-4" />
@@ -224,27 +228,44 @@ export default function ApiKeysPage() {
                 </div>
               ) : (
                 <>
-                  <div className="flex gap-2 rounded border border-zinc-800 bg-zinc-900/50 p-3 text-xs leading-5 text-zinc-300">
-                    <ShieldCheck aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0" />
-                    Encrypted with AES-256 (Fernet) prior to database insertion. Raw keys are never logged or exposed in plaintext.
+                  <div className="grid gap-2 sm:grid-cols-2" role="group" aria-label="Upstream credential mode">
+                    <button
+                      type="button"
+                      aria-pressed={credentialMode === 'zero-trust'}
+                      onClick={() => setCredentialMode('zero-trust')}
+                      className={`rounded-md border p-3 text-left transition-colors ${credentialMode === 'zero-trust' ? 'border-sky-500/40 bg-sky-500/10 text-sky-200' : 'border-zinc-800 text-zinc-400 hover:border-zinc-700'}`}
+                    >
+                      <span className="block font-mono text-[11px] font-medium">Zero-Trust Mode <span className="text-sky-400">(Recommended)</span></span>
+                      <span className="mt-1 block text-[11px] leading-4 text-zinc-400">Generate key with 0 inputs. Pass your OpenAI key directly in your client headers (<code className="font-mono text-zinc-300">x-upstream-key</code>). We do not store it; the request processes it in volatile memory and forwards it to OpenAI.</span>
+                    </button>
+                    <button
+                      type="button"
+                      aria-pressed={credentialMode === 'vault'}
+                      onClick={() => setCredentialMode('vault')}
+                      className={`rounded-md border p-3 text-left transition-colors ${credentialMode === 'vault' ? 'border-sky-500/40 bg-sky-500/10 text-sky-200' : 'border-zinc-800 text-zinc-400 hover:border-zinc-700'}`}
+                    >
+                      <span className="block font-mono text-[11px] font-medium">Encrypted Vault Mode</span>
+                      <span className="mt-1 block text-[11px] leading-4 text-zinc-400">Store your OpenAI key encrypted at rest (AES-256 Fernet) if your client library cannot send custom headers.</span>
+                    </button>
                   </div>
                   <form onSubmit={(event) => void provisionKey(event)} className="space-y-4">
-                    <div>
-                      <label htmlFor="upstream-key" className="mb-2 block font-mono text-xs text-zinc-400">UPSTREAM OPENAI API KEY</label>
-                      <input
-                        id="upstream-key"
-                        type="password"
-                        autoComplete="off"
-                        required
-                        minLength={8}
-                        value={upstreamKey}
-                        onChange={(event) => setUpstreamKey(event.target.value)}
-                        placeholder="sk-proj-…"
-                        className="w-full rounded border border-zinc-800 bg-[#090a0f] px-3 py-2.5 font-mono text-xs text-white outline-none focus:border-zinc-600"
-                      />
-                    </div>
+                    {credentialMode === 'vault' && (
+                      <div>
+                        <label htmlFor="upstream-key" className="mb-2 block font-mono text-xs text-zinc-400">OPENAI API KEY</label>
+                        <input
+                          id="upstream-key"
+                          type="password"
+                          autoComplete="off"
+                          minLength={10}
+                          value={upstreamKey}
+                          onChange={(event) => setUpstreamKey(event.target.value)}
+                          placeholder="sk-proj-…"
+                          className="w-full rounded border border-zinc-800 bg-[#090a0f] px-3 py-2.5 font-mono text-xs text-white outline-none focus:border-sky-500/50"
+                        />
+                      </div>
+                    )}
                     <button type="submit" disabled={submitting} className="rounded-md bg-zinc-100 px-3 py-2 text-xs font-medium text-zinc-950 shadow-sm transition hover:bg-white disabled:opacity-50">
-                      {submitting ? 'Provisioning…' : 'Provision Protected Key'}
+                      {submitting ? 'Generating…' : 'Generate Shunt Key'}
                     </button>
                   </form>
                 </>

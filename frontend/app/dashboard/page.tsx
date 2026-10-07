@@ -158,12 +158,12 @@ export default function DashboardPage() {
 
       <section aria-label="Usage metrics" className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {metrics.map(({ key, label, icon: Icon, format }) => (
-          <article key={key} className="rounded-md border border-white/[0.08] bg-[#0d0e12] p-4">
+          <article key={key} className="rounded-md border border-white/[0.08] bg-[#0d0e12] p-4 transition-colors hover:border-sky-500/40">
             <div className="flex items-center justify-between gap-3 text-xs text-zinc-400">
               {label}
               <Icon aria-hidden="true" className="h-4 w-4 text-zinc-600" />
             </div>
-            <p className="mt-4 font-mono text-2xl tracking-tight text-white">
+            <p className="mt-4 font-mono text-2xl tracking-tight text-sky-400">
               {loading ? <span className="inline-block h-7 w-24 animate-pulse rounded bg-zinc-800" /> : format(values[key])}
             </p>
           </article>
@@ -173,8 +173,8 @@ export default function DashboardPage() {
       <section aria-label="Gateway status" className="rounded-md border border-white/[0.08] bg-[#0d0e12]">
         <div className="flex items-center justify-between border-b border-white/[0.08] px-4 py-3">
           <h2 className="text-sm font-medium text-zinc-200">Gateway status</h2>
-          <span className="inline-flex items-center gap-2 font-mono text-[11px] text-zinc-400">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" /> OPERATIONAL
+          <span className="inline-flex items-center gap-2 rounded border border-sky-500/20 bg-sky-500/10 px-2 py-1 font-mono text-[11px] text-sky-400">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-sky-400 shadow-[0_0_8px_#38BDF8]" /> OPERATIONAL
           </span>
         </div>
         <div className="grid divide-y divide-white/[0.08] sm:grid-cols-2 sm:divide-y-0 lg:grid-cols-4">
@@ -193,7 +193,7 @@ export default function DashboardPage() {
       </section>
 
       <section className="grid gap-5 xl:grid-cols-[minmax(0,1.3fr)_minmax(300px,0.7fr)]">
-        <article className="rounded-md border border-white/[0.08] bg-[#0d0e12]">
+        <article className="rounded-md border border-white/[0.08] bg-[#0d0e12] transition-colors hover:border-sky-500/40">
           <div className="flex items-center justify-between border-b border-white/[0.08] px-4 py-3">
             <div className="flex items-center gap-2">
               <KeyRound aria-hidden="true" className="h-4 w-4 text-zinc-500" />
@@ -232,7 +232,7 @@ export default function DashboardPage() {
           </div>
         </article>
 
-        <article className="rounded-md border border-white/[0.08] bg-[#0d0e12]">
+        <article className="rounded-md border border-white/[0.08] bg-[#0d0e12] transition-colors hover:border-sky-500/40">
           <div className="flex items-center justify-between border-b border-white/[0.08] px-4 py-3">
             <div className="flex items-center gap-2">
               <Clock3 aria-hidden="true" className="h-4 w-4 text-zinc-500" />

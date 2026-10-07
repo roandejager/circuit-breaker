@@ -6,8 +6,8 @@ import { Footer, Navbar } from '@/components/Navigation';
 import { LoopSavingsCalculator } from '@/components/LoopSavingsCalculator';
 
 export const metadata: Metadata = {
-  title: 'Pricing & ROI | AI Circuit Breaker',
-  description: 'Compare AI Circuit Breaker Free and Pro tiers, estimate avoided loop spend, and review gateway limits.',
+  title: 'Pricing & ROI | Shunt',
+  description: 'Compare Shunt Free and Pro tiers, estimate avoided loop spend, and review gateway limits.',
 };
 
 const polarCheckoutUrl = 'https://buy.polar.sh/polar_cl_4jPE6jEIy8EMhcJJX28OwVF3RFFLv0uFsc9Mv1Hgayd';
@@ -28,7 +28,7 @@ const proFeatures = [
 
 export default function PricingPage() {
   return (
-    <main className="min-h-screen bg-[#090a0f]/90 text-zinc-100">
+    <main className="min-h-screen bg-[#0a0a0a] text-zinc-100">
       <Navbar />
       <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
         <nav aria-label="Breadcrumb" className="font-mono text-xs text-zinc-500">
@@ -45,7 +45,7 @@ export default function PricingPage() {
         <LoopSavingsCalculator />
 
         <section aria-label="Pricing plans" className="mt-8 grid gap-4 lg:grid-cols-2">
-          <article className="flex flex-col rounded-md border border-white/[0.08] bg-[#0d0e12]">
+          <article className="flex flex-col rounded-md border border-white/[0.08] bg-[#0d0e12] transition-colors hover:border-sky-500/40">
             <div className="border-b border-white/[0.08] p-5 sm:p-6">
               <p className="font-mono text-xs uppercase tracking-widest text-zinc-500">Developer</p>
               <h2 className="mt-2 text-xl font-semibold text-white">Free</h2>
@@ -66,7 +66,7 @@ export default function PricingPage() {
             </div>
           </article>
 
-          <article className="flex flex-col rounded-md border border-white/[0.08] bg-[#0d0e12]">
+          <article className="flex flex-col rounded-md border border-white/[0.08] bg-[#0d0e12] transition-colors hover:border-sky-500/40">
             <div className="border-b border-white/[0.08] p-5 sm:p-6">
               <p className="font-mono text-xs uppercase tracking-widest text-zinc-500">Production</p>
               <h2 className="mt-2 text-xl font-semibold text-white">Pro</h2>

@@ -3,8 +3,8 @@ import Link from 'next/link';
 import { Footer, Navbar } from '@/components/Navigation';
 
 export const metadata: Metadata = {
-  title: 'Developer Documentation | AI Circuit Breaker',
-  description: 'Configure the AI Circuit Breaker OpenAI-compatible proxy with Python, TypeScript, CrewAI, LangChain, LangGraph, AutoGen, or REST.',
+  title: 'Developer Documentation | Shunt',
+  description: 'Configure Shunt, the In-Memory LLM Firewall, with Python, TypeScript, CrewAI, LangChain, LangGraph, AutoGen, or REST.',
 };
 
 const sections = [
@@ -17,7 +17,7 @@ const sections = [
 
 function CodeBlock({ title, children }: { title: string; children: string }) {
   return (
-    <div className="overflow-hidden rounded-md border border-zinc-800 bg-[#090a0f]">
+    <div className="overflow-hidden rounded-md border border-zinc-800 bg-[#0a0a0a]">
       <div className="border-b border-zinc-800 px-4 py-2 font-mono text-[10px] uppercase tracking-wide text-zinc-500">{title}</div>
       <pre className="overflow-x-auto p-4 font-mono text-[12px] leading-5 text-zinc-300"><code>{children}</code></pre>
     </div>
@@ -26,7 +26,7 @@ function CodeBlock({ title, children }: { title: string; children: string }) {
 
 export default function DocumentationPage() {
   return (
-    <main className="min-h-screen bg-[#090a0f]/90 text-zinc-100">
+    <main className="min-h-screen bg-[#0a0a0a] text-zinc-100">
       <Navbar />
       <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
         <nav aria-label="Breadcrumb" className="font-mono text-xs text-zinc-500">
@@ -54,7 +54,7 @@ export default function DocumentationPage() {
             <section id="quickstart" className="scroll-mt-20 space-y-4">
               <div>
                 <h2 className="text-base font-semibold text-white">01. Quickstart</h2>
-                <p className="mt-2 text-xs leading-5 text-zinc-400">Create a protected key from the dashboard, then replace the client base URL and API key. The key shown below is a placeholder.</p>
+                <p className="mt-2 text-xs leading-5 text-zinc-400">Create a Shunt key from the dashboard, then replace the client base URL and API key. For Zero-Trust Mode, send your provider credential as <code className="font-mono text-sky-400">x-upstream-key</code>; it is processed in memory and not stored.</p>
               </div>
               <div className="grid gap-3 xl:grid-cols-2">
                 <CodeBlock title="OpenAI Python">{`from openai import OpenAI\n\nclient = OpenAI(\n    base_url="https://circuit-breaker-api.onrender.com/v1",\n    api_key="cb_live_...",\n)\n\nresponse = client.chat.completions.create(\n    model="gpt-4o-mini",\n    messages=[{"role": "user", "content": "Hello"}],\n)`}</CodeBlock>
@@ -65,15 +65,15 @@ export default function DocumentationPage() {
             <section id="frameworks" className="scroll-mt-20 space-y-4">
               <div>
                 <h2 className="text-base font-semibold text-white">02. Framework Integration</h2>
-                <p className="mt-2 text-xs leading-5 text-zinc-400">Set the framework&apos;s OpenAI-compatible endpoint to the gateway and provide a protected Circuit Breaker key.</p>
+                <p className="mt-2 text-xs leading-5 text-zinc-400">Set the framework&apos;s OpenAI-compatible endpoint to Shunt and provide a Shunt API key.</p>
               </div>
               <div className="space-y-3">
-                <CodeBlock title="CrewAI · Python">{`import os\nfrom crewai import LLM, Agent\n\nllm = LLM(\n    model="openai/gpt-4o-mini",\n    base_url="https://circuit-breaker-api.onrender.com/v1",\n    api_key=os.environ["CIRCUIT_BREAKER_API_KEY"],\n)\n\nresearcher = Agent(\n    role="Research analyst",\n    goal="Answer the assigned research question",\n    backstory="A careful technical researcher.",\n    llm=llm,\n)`}</CodeBlock>
-                <CodeBlock title="LangChain / LangGraph · Python">{`import os\nfrom langchain_openai import ChatOpenAI\n\nllm = ChatOpenAI(\n    model="gpt-4o-mini",\n    base_url="https://circuit-breaker-api.onrender.com/v1",\n    api_key=os.environ["CIRCUIT_BREAKER_API_KEY"],\n)\n\n# Use llm.invoke(...) directly or bind it to a LangGraph node.`}</CodeBlock>
-                <CodeBlock title="AutoGen · Python">{`import os\nfrom autogen import AssistantAgent\n\nconfig_list = [{\n    "model": "gpt-4o-mini",\n    "api_type": "openai",\n    "base_url": "https://circuit-breaker-api.onrender.com/v1",\n    "api_key": os.environ["CIRCUIT_BREAKER_API_KEY"],\n}]\n\nassistant = AssistantAgent(\n    name="assistant",\n    llm_config={"config_list": config_list},\n)`}</CodeBlock>
+                <CodeBlock title="CrewAI · Python">{`import os\nfrom crewai import LLM, Agent\n\nllm = LLM(\n    model="openai/gpt-4o-mini",\n    base_url="https://circuit-breaker-api.onrender.com/v1",\n    api_key=os.environ["SHUNT_API_KEY"],\n)\n\nresearcher = Agent(\n    role="Research analyst",\n    goal="Answer the assigned research question",\n    backstory="A careful technical researcher.",\n    llm=llm,\n)`}</CodeBlock>
+                <CodeBlock title="LangChain / LangGraph · Python">{`import os\nfrom langchain_openai import ChatOpenAI\n\nllm = ChatOpenAI(\n    model="gpt-4o-mini",\n    base_url="https://circuit-breaker-api.onrender.com/v1",\n    api_key=os.environ["SHUNT_API_KEY"],\n)\n\n# Use llm.invoke(...) directly or bind it to a LangGraph node.`}</CodeBlock>
+                <CodeBlock title="AutoGen · Python">{`import os\nfrom autogen import AssistantAgent\n\nconfig_list = [{\n    "model": "gpt-4o-mini",\n    "api_type": "openai",\n    "base_url": "https://circuit-breaker-api.onrender.com/v1",\n    "api_key": os.environ["SHUNT_API_KEY"],\n}]\n\nassistant = AssistantAgent(\n    name="assistant",\n    llm_config={"config_list": config_list},\n)`}</CodeBlock>
                 <CodeBlock title="cURL / REST API">{`curl https://circuit-breaker-api.onrender.com/v1/chat/completions -H "Authorization: Bearer cb_live_..." -H "Content-Type: application/json" -d '{"model":"gpt-4o-mini","messages":[{"role":"user","content":"Hello"}],"stream":false}'`}</CodeBlock>
               </div>
-              <div className="rounded-md border border-zinc-800 bg-[#090a0f] p-4 text-xs leading-5 text-zinc-500">
+              <div className="rounded-md border border-zinc-800 bg-[#0a0a0a] p-4 text-xs leading-5 text-zinc-500">
                 Send requests to <code className="font-mono text-zinc-300">/v1/chat/completions</code>. Include the protected key as a bearer token and send an OpenAI-compatible JSON body with at least a model and messages field. Do not embed upstream provider keys in client-side applications.
               </div>
             </section>
@@ -81,7 +81,7 @@ export default function DocumentationPage() {
             <section id="errors" className="scroll-mt-20 space-y-4">
               <div>
                 <h2 className="text-base font-semibold text-white">03. Error Codes &amp; Protocols</h2>
-                <p className="mt-2 text-xs leading-5 text-zinc-400">A blocked request includes a machine-readable code in its JSON error body.</p>
+                <p className="mt-2 text-xs leading-5 text-zinc-400">Loop detection returns an OpenAI-compatible HTTP 200 completion with <code className="font-mono text-sky-400">finish_reason: stop</code>. Invalid keys return HTTP 400; budget breaches return HTTP 429.</p>
               </div>
               <div className="overflow-x-auto border-y border-zinc-800">
                 <table className="w-full min-w-[620px] text-left text-xs">
@@ -89,13 +89,14 @@ export default function DocumentationPage() {
                     <tr><th className="px-4 py-3 font-normal">HTTP</th><th className="px-4 py-3 font-normal">Error code</th><th className="px-4 py-3 font-normal">Meaning</th></tr>
                   </thead>
                   <tbody className="divide-y divide-zinc-800/80">
-                    <tr className="hover:bg-zinc-900/50"><td className="px-4 py-3 font-mono text-rose-300">400</td><td className="px-4 py-3 font-mono text-zinc-200">infinite_loop_killed</td><td className="px-4 py-3 text-zinc-400">Prompt repetition threshold exceeded; the loop request was stopped.</td></tr>
+                    <tr className="hover:bg-zinc-900/50"><td className="px-4 py-3 font-mono text-sky-400">200</td><td className="px-4 py-3 font-mono text-zinc-200">finish_reason: stop</td><td className="px-4 py-3 text-zinc-400">Prompt repetition threshold exceeded; a graceful completion stops the agent without an HTTP retry.</td></tr>
+                    <tr className="hover:bg-zinc-900/50"><td className="px-4 py-3 font-mono text-rose-300">400</td><td className="px-4 py-3 font-mono text-zinc-200">missing_upstream_key</td><td className="px-4 py-3 text-zinc-400">No provider key was supplied in the request header or encrypted vault.</td></tr>
                     <tr className="hover:bg-zinc-900/50"><td className="px-4 py-3 font-mono text-amber-300">429</td><td className="px-4 py-3 font-mono text-zinc-200">budget_limit_breached</td><td className="px-4 py-3 text-zinc-400">Hourly or daily dollar ceiling reached.</td></tr>
                     <tr className="hover:bg-zinc-900/50"><td className="px-4 py-3 font-mono text-zinc-300">502</td><td className="px-4 py-3 font-mono text-zinc-200">upstream_error</td><td className="px-4 py-3 text-zinc-400">Upstream provider is unreachable or timed out.</td></tr>
                   </tbody>
                 </table>
               </div>
-              <CodeBlock title="Error response example">{`{\n  "error": {\n    "message": "Request blocked by Circuit Breaker",\n    "type": "circuit_breaker_loop_detected",\n    "code": "infinite_loop_killed"\n  }\n}`}</CodeBlock>
+              <CodeBlock title="Graceful loop-stop completion">{`{\n  "object": "chat.completion",\n  "choices": [{\n    "message": { "role": "assistant", "content": "[SHUNT ALERT]: Execution halted." },\n    "finish_reason": "stop"\n  }],\n  "circuit_breaker": { "triggered": true, "reason": "Repeated prompt." }\n}`}</CodeBlock>
             </section>
 
             <section id="security" className="scroll-mt-20 space-y-4">
@@ -105,7 +106,8 @@ export default function DocumentationPage() {
               <div className="border-y border-zinc-800">
                 <div className="grid divide-y divide-zinc-800 sm:grid-cols-2 sm:divide-y-0">
                   {[
-                    ['Upstream credentials', 'Encrypted at rest with AES-256 (Fernet) before database insertion.'],
+                    ['Zero-Trust credentials', 'Supplied with x-upstream-key and processed in request memory without storage.'],
+                    ['Vault credentials', 'Optionally encrypted at rest with AES-256 (Fernet).'],
                     ['Protected key lookup', 'SHA-256 key hashing is used for lookup; full protected secrets are shown once.'],
                     ['Prompt bodies', 'Used in memory for loop detection and not written to disk.'],
                     ['Request logs', 'Usage and operational metadata are recorded; prompt text is not part of the request log schema.'],

@@ -3,11 +3,14 @@ import { ShieldAlert } from 'lucide-react';
 
 export function Navbar() {
   return (
-    <header className="sticky top-0 z-40 border-b border-zinc-800/80 bg-[#090a0f]/80 backdrop-blur-md">
+    <header className="sticky top-0 z-40 border-b border-zinc-800/80 bg-[#0a0a0a]/90">
       <nav aria-label="Main navigation" className="mx-auto flex h-14 max-w-7xl items-center justify-between px-5 sm:px-8">
         <Link href="/" className="inline-flex items-center gap-2 text-zinc-100">
-          <ShieldAlert aria-hidden="true" className="h-[22px] w-[22px] text-zinc-400" />
-          <span className="font-mono text-xs font-semibold tracking-tight">AI Circuit Breaker</span>
+          <ShieldAlert aria-hidden="true" className="h-[22px] w-[22px] text-sky-400" />
+          <span className="flex flex-col">
+            <span className="font-mono text-xs font-semibold tracking-tight">Shunt</span>
+            <span className="text-[9px] text-zinc-500">The In-Memory LLM Firewall</span>
+          </span>
         </Link>
         <div className="flex items-center gap-4 sm:gap-6">
           <Link href="/docs" className="text-xs text-zinc-400 hover:text-white">Docs</Link>
@@ -22,19 +25,19 @@ export function Navbar() {
 
 export function Footer() {
   return (
-    <footer className="border-t border-zinc-800/80 bg-[#090a0f]">
+    <footer className="border-t border-zinc-800/80 bg-[#0a0a0a]">
       <div className="mx-auto grid max-w-7xl gap-7 px-5 py-7 sm:grid-cols-2 sm:px-8 lg:grid-cols-4">
         <div>
           <Link href="/" className="inline-flex items-center gap-2 font-mono text-xs font-semibold text-zinc-200">
-            <ShieldAlert aria-hidden="true" className="h-4 w-4 text-zinc-500" />
-            AI Circuit Breaker
+            <ShieldAlert aria-hidden="true" className="h-4 w-4 text-sky-400" />
+            Shunt
           </Link>
-          <p className="mt-2 max-w-xs text-[11px] leading-4 text-zinc-600">Request-loop detection and spend controls for OpenAI-compatible agent traffic.</p>
+          <p className="mt-2 max-w-xs text-[11px] leading-4 text-zinc-500">The In-Memory LLM Firewall. Request-loop detection and spend controls for OpenAI-compatible agent traffic.</p>
         </div>
         <div>
           <h2 className="font-mono text-[10px] uppercase tracking-wider text-zinc-500">Service</h2>
           <p className="mt-2 inline-flex items-center gap-2 text-xs text-zinc-400">
-            <span aria-hidden="true" className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+            <span aria-hidden="true" className="h-1.5 w-1.5 animate-pulse rounded-full bg-sky-400 shadow-[0_0_8px_#38BDF8]" />
             Gateway status
           </p>
           <a href="mailto:contact.roandejager@gmail.com" className="mt-2 block text-xs text-zinc-500 hover:text-zinc-300">contact.roandejager@gmail.com</a>
@@ -57,7 +60,7 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t border-zinc-800/80 px-5 py-3 text-center font-mono text-[10px] text-zinc-700 sm:px-8">
-        © {new Date().getFullYear()} AI Circuit Breaker
+        © {new Date().getFullYear()} Shunt
       </div>
     </footer>
   );

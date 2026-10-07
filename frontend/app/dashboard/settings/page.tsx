@@ -124,8 +124,8 @@ export default function SettingsPage() {
     setTesting(true);
     try {
       const payload = parsedWebhook.isDiscord
-        ? { content: 'AI Circuit Breaker test ping: emergency webhook is configured.' }
-        : { text: 'AI Circuit Breaker test ping: emergency webhook is configured.' };
+        ? { content: 'Shunt test ping: emergency webhook is configured.' }
+        : { text: 'Shunt test ping: emergency webhook is configured.' };
       const response = await fetch(parsedWebhook.url.href, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

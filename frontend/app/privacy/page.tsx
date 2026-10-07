@@ -2,20 +2,20 @@ import Link from 'next/link';
 import { ArrowLeft, Shield } from 'lucide-react';
 
 export const metadata = {
-  title: 'Privacy Policy | AI Circuit Breaker',
-  description: 'How AI Circuit Breaker handles API credentials, encryption, and request metadata.',
+  title: 'Privacy Policy | Shunt',
+  description: 'How Shunt handles API credentials, encryption, and request metadata.',
 };
 
 export default function PrivacyPolicy() {
   return (
-    <div className="min-h-screen bg-[#090a0f] text-zinc-300 font-sans selection:bg-zinc-800 selection:text-white">
+    <div className="min-h-screen bg-[#0a0a0a] text-zinc-300 font-sans selection:bg-zinc-800 selection:text-white">
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link 
           href="/" 
           className="inline-flex items-center space-x-2 text-xs font-mono text-zinc-500 hover:text-white transition mb-12"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Back to Circuit Breaker</span>
+          <span>Back to Shunt</span>
         </Link>
 
         <div className="flex items-center space-x-3 mb-6">
@@ -28,7 +28,7 @@ export default function PrivacyPolicy() {
           <section className="space-y-3">
             <h2 className="text-base font-semibold text-white">1. Core Philosophy: Zero-Payload Retention</h2>
             <p>
-              AI Circuit Breaker operates as an in-line reverse proxy. We believe in strict data minimization. 
+              Shunt operates as an in-line reverse proxy. We believe in strict data minimization.
               <strong> We do not store, log, or train on the text contents of your prompts or completions.</strong> 
               Request payloads are parsed in volatile memory solely to calculate prompt hashes for recursion detection and token counts for cost caps, then immediately streamed through to the upstream model provider.
             </p>
@@ -41,13 +41,13 @@ export default function PrivacyPolicy() {
                 <strong className="text-zinc-200">Account Credentials:</strong> Your email address and hashed passwords, managed via Supabase Auth.
               </li>
               <li>
-                <strong className="text-zinc-200">Encrypted Upstream API Keys:</strong> Third-party provider keys (e.g. OpenAI) provided by you are encrypted using AES-256 (Fernet) prior to storage. Plaintext keys are never written to disk or database logs.
+                <strong className="text-zinc-200">Upstream API Keys:</strong> In Zero-Trust Mode, provider keys sent in <code className="font-mono">x-upstream-key</code> are processed in request memory and are not stored. If you choose Vault Mode, keys are encrypted using AES-256 (Fernet) before storage.
               </li>
               <li>
-                <strong className="text-zinc-200">Circuit Breaker API Keys:</strong> Proxy keys issued to you are hashed with SHA-256. Only the hash and an 8-character prefix are stored.
+                <strong className="text-zinc-200">Shunt API Keys:</strong> Proxy keys issued to you are hashed with SHA-256. Only the hash and an 8-character prefix are stored.
               </li>
               <li>
-                <strong className="text-zinc-200">Operational Metadata:</strong> We log request metadata for billing and dashboard reporting: timestamp, session identifier, model name, token usage counts, calculated cost, HTTP status code, and whether a circuit breaker rule terminated the request.
+                <strong className="text-zinc-200">Operational Metadata:</strong> We log request metadata for billing and dashboard reporting: timestamp, session identifier, model name, token usage counts, calculated cost, HTTP status code, and whether a Shunt rule terminated the request.
               </li>
             </ul>
           </section>
