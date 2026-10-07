@@ -42,6 +42,8 @@ async def sse_stream_generator(
     session_id: str,
     model: str,
     input_tokens: int,
+    sandbox_mode: bool = False,
+    sandbox_budget_identifier: str = "",
 ) -> AsyncGenerator[bytes, None]:
     """
     Streams OpenAI SSE chunks directly to the client without buffering,
@@ -75,18 +77,20 @@ async def sse_stream_generator(
         output_tokens = cost_engine.count_tokens_from_text(full_output_text, model=model)
         total_cost = cost_engine.calculate_cost(model, input_tokens, output_tokens)
 
-        # Log usage to Supabase
-        db_service.log_request(
-            user_id=user_id,
-            api_key_id=api_key_id,
-            session_id=session_id,
-            model=model,
-            input_tokens=input_tokens,
-            output_tokens=output_tokens,
-            cost_usd=total_cost,
-            status_code=200,
-            was_blocked=False
-        )
+        if sandbox_mode:
+            cost_engine.record_spend(sandbox_budget_identifier, total_cost)
+        else:
+            db_service.log_request(
+                user_id=user_id,
+                api_key_id=api_key_id,
+                session_id=session_id,
+                model=model,
+                input_tokens=input_tokens,
+                output_tokens=output_tokens,
+                cost_usd=total_cost,
+                status_code=200,
+                was_blocked=False
+            )
 
         logger.info(
             f"[STREAM COMPLETED] User: {user_id[:8]} | Model: {model} | "
@@ -108,21 +112,52 @@ async def chat_completions_proxy(request: Request, background_tasks: BackgroundT
 
     raw_proxy_key = auth_header.replace("Bearer ", "").strip()
 
-    # 1. AUTHENTICATE PROXY KEY VIA SUPABASE
-    key_context = db_service.authenticate_proxy_key(raw_proxy_key)
-    if not key_context:
+    sandbox_mode = raw_proxy_key == "cb_sandbox_test"
+    ephemeral_key = request.headers.get("x-upstream-key", "").strip()
+    sandbox_budget_identifier = ""
+
+    if sandbox_mode:
+        user_id = "sandbox_anonymous"
+        api_key_id = "key_sandbox"
+        hourly_limit = 5.0
+        daily_limit = 20.0
+        upstream_key = ephemeral_key
+        client_host = request.client.host if request.client else "unknown"
+        session_id = request.headers.get("x-session-id", f"sandbox_{client_host}")
+        sandbox_budget_identifier = f"sandbox:{client_host}"
+    else:
+        # 1. AUTHENTICATE PROXY KEY VIA SUPABASE
+        key_context = db_service.authenticate_proxy_key(raw_proxy_key)
+        if not key_context:
+            return JSONResponse(
+                status_code=401,
+                content={"error": {"message": "Invalid or revoked Circuit Breaker API key.", "type": "auth_error", "code": "invalid_api_key"}}
+            )
+
+        user_id = key_context["user_id"]
+        api_key_id = key_context["api_key_id"]
+        upstream_key = ephemeral_key or key_context.get("upstream_key")
+        hourly_limit = key_context["hourly_limit"]
+        daily_limit = key_context["daily_limit"]
+        session_id = request.headers.get("x-session-id", f"sess_{raw_proxy_key[-8:]}")
+
+    if not upstream_key:
+        if sandbox_mode:
+            message = "Sandbox mode requires your OpenAI key in 'x-upstream-key: sk-proj-...'. It is processed in volatile RAM and never stored."
+            error_code = "missing_upstream_key"
+        else:
+            message = "No upstream OpenAI key found. Zero-Trust Mode: pass 'x-upstream-key: sk-proj-...' in your request headers. Stored Mode: configure an encrypted key in the dashboard."
+            error_code = "missing_upstream_key"
         return JSONResponse(
-            status_code=401,
-            content={"error": {"message": "Invalid or revoked Circuit Breaker API key.", "type": "auth_error", "code": "invalid_api_key"}}
+            status_code=400,
+            content={
+                "error": {
+                    "message": message,
+                    "type": "invalid_request_error",
+                    "code": error_code,
+                }
+            },
         )
-
-    user_id = key_context["user_id"]
-    api_key_id = key_context["api_key_id"]
-    upstream_key = key_context["upstream_key"]
-    hourly_limit = key_context["hourly_limit"]
-    daily_limit = key_context["daily_limit"]
-
-    session_id = request.headers.get("x-session-id", f"sess_{raw_proxy_key[-8:]}")
 
     try:
         body = await request.json()
@@ -136,32 +171,44 @@ async def chat_completions_proxy(request: Request, background_tasks: BackgroundT
     model = body.get("model", "gpt-4o")
     is_stream = body.get("stream", False)
 
-    # 2. CIRCUIT BREAKER CHECK: Budget Caps (from PostgreSQL)
-    hourly_spend, daily_spend = db_service.get_user_spend(user_id)
-    if hourly_spend >= hourly_limit or daily_spend >= daily_limit:
-        reason = (
+    # Sandbox accounting remains process-local so anonymous calls never need a
+    # fabricated Supabase user or request-log row.
+    if sandbox_mode:
+        budget_exceeded, budget_reason, hourly_spend, daily_spend = cost_engine.is_budget_exceeded(
+            sandbox_budget_identifier,
+            hourly_limit=hourly_limit,
+            daily_limit=daily_limit,
+        )
+    else:
+        hourly_spend, daily_spend = db_service.get_user_spend(user_id)
+        budget_exceeded = hourly_spend >= hourly_limit or daily_spend >= daily_limit
+        budget_reason = (
             f"Hourly spend cap of ${hourly_limit:.2f} reached (Current: ${hourly_spend:.4f})"
             if hourly_spend >= hourly_limit
             else f"Daily spend cap of ${daily_limit:.2f} reached (Current: ${daily_spend:.4f})"
         )
-        logger.warning(f"[CIRCUIT BREAKER] Spend limit breached for user {user_id}. {reason}")
 
-        background_tasks.add_task(
-            db_service.log_request,
-            user_id=user_id,
-            api_key_id=api_key_id,
-            session_id=session_id,
-            model=model,
-            input_tokens=0,
-            output_tokens=0,
-            cost_usd=0.0,
-            status_code=429,
-            was_blocked=True,
-            blocked_reason=reason
-        )
+    # 2. CIRCUIT BREAKER CHECK: Budget Caps
+    if budget_exceeded:
+        logger.warning(f"[CIRCUIT BREAKER] Spend limit breached for user {user_id}. {budget_reason}")
+
+        if not sandbox_mode:
+            background_tasks.add_task(
+                db_service.log_request,
+                user_id=user_id,
+                api_key_id=api_key_id,
+                session_id=session_id,
+                model=model,
+                input_tokens=0,
+                output_tokens=0,
+                cost_usd=0.0,
+                status_code=429,
+                was_blocked=True,
+                blocked_reason=budget_reason
+            )
         return JSONResponse(
             status_code=429,
-            content={"error": {"message": reason, "type": "circuit_breaker_budget_exceeded", "code": "budget_limit_breached"}}
+            content={"error": {"message": budget_reason, "type": "circuit_breaker_budget_exceeded", "code": "budget_limit_breached"}}
         )
 
     input_tokens = cost_engine.count_tokens_from_messages(messages, model=model)
@@ -175,25 +222,26 @@ async def chat_completions_proxy(request: Request, background_tasks: BackgroundT
             f"{loop_reason} Stream terminated to prevent runaway API spend."
         )
 
-        background_tasks.add_task(
-            db_service.log_request,
-            user_id=user_id,
-            api_key_id=api_key_id,
-            session_id=session_id,
-            model=model,
-            input_tokens=input_tokens,
-            output_tokens=0,
-            cost_usd=0.0,
-            status_code=400,
-            was_blocked=True,
-            blocked_reason=loop_reason
-        )
+        if not sandbox_mode:
+            background_tasks.add_task(
+                db_service.log_request,
+                user_id=user_id,
+                api_key_id=api_key_id,
+                session_id=session_id,
+                model=model,
+                input_tokens=input_tokens,
+                output_tokens=0,
+                cost_usd=0.0,
+                status_code=200,
+                was_blocked=True,
+                blocked_reason=loop_reason
+            )
 
         if is_stream:
             return StreamingResponse(
                 graceful_stop_stream(model, warning_message),
                 media_type="text/event-stream",
-                background=background_tasks,
+                background=None if sandbox_mode else background_tasks,
             )
 
         created = int(time.time())
@@ -216,7 +264,7 @@ async def chat_completions_proxy(request: Request, background_tasks: BackgroundT
                 },
                 "circuit_breaker": {"triggered": True, "reason": loop_reason},
             },
-            background=background_tasks,
+            background=None if sandbox_mode else background_tasks,
         )
 
     # 4. FORWARD TO UPSTREAM OPENAI USING DECRYPTED USER KEY
@@ -240,7 +288,17 @@ async def chat_completions_proxy(request: Request, background_tasks: BackgroundT
                 return Response(content=error_body, status_code=upstream_res.status_code, media_type="application/json")
 
             return StreamingResponse(
-                sse_stream_generator(upstream_res, client, user_id, api_key_id, session_id, model, input_tokens),
+                sse_stream_generator(
+                    upstream_res,
+                    client,
+                    user_id,
+                    api_key_id,
+                    session_id,
+                    model,
+                    input_tokens,
+                    sandbox_mode=sandbox_mode,
+                    sandbox_budget_identifier=sandbox_budget_identifier,
+                ),
                 media_type="text/event-stream"
             )
 
@@ -255,19 +313,22 @@ async def chat_completions_proxy(request: Request, background_tasks: BackgroundT
         output_tokens = data.get("usage", {}).get("completion_tokens", 0)
         total_cost = cost_engine.calculate_cost(model, input_tokens, output_tokens)
 
-        # Record spend in background to avoid blocking the response
-        background_tasks.add_task(
-            db_service.log_request,
-            user_id=user_id,
-            api_key_id=api_key_id,
-            session_id=session_id,
-            model=model,
-            input_tokens=input_tokens,
-            output_tokens=output_tokens,
-            cost_usd=total_cost,
-            status_code=200,
-            was_blocked=False
-        )
+        if sandbox_mode:
+            cost_engine.record_spend(sandbox_budget_identifier, total_cost)
+        else:
+            # Record spend in background to avoid blocking the response.
+            background_tasks.add_task(
+                db_service.log_request,
+                user_id=user_id,
+                api_key_id=api_key_id,
+                session_id=session_id,
+                model=model,
+                input_tokens=input_tokens,
+                output_tokens=output_tokens,
+                cost_usd=total_cost,
+                status_code=200,
+                was_blocked=False
+            )
 
         logger.info(
             f"[REQUEST COMPLETED] User: {user_id[:8]} | Model: {model} | "
@@ -278,7 +339,7 @@ async def chat_completions_proxy(request: Request, background_tasks: BackgroundT
 
     except httpx.RequestError as exc:
         await client.aclose()
-        logger.error(f"[UPSTREAM ERROR] Failed to connect to OpenAI: {exc}")
+        logger.error("[UPSTREAM ERROR] Failed to connect to upstream provider (%s).", type(exc).__name__)
         return JSONResponse(
             status_code=502,
             content={"error": {"message": "Upstream OpenAI service timed out or unavailable.", "type": "bad_gateway", "code": "upstream_error"}}

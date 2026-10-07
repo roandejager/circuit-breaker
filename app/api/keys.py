@@ -1,4 +1,5 @@
 import logging
+from typing import Optional
 from fastapi import APIRouter, HTTPException, Header
 from pydantic import BaseModel, Field
 from app.services.db import db_service
@@ -8,7 +9,10 @@ logger = logging.getLogger("circuit_breaker_keys")
 
 
 class CreateKeyRequest(BaseModel):
-    upstream_key: str = Field(..., min_length=10, description="Customer raw OpenAI API key starting with sk-")
+    upstream_key: Optional[str] = Field(
+        default=None,
+        description="Optional customer raw OpenAI API key starting with sk-",
+    )
 
 
 class CreateKeyResponse(BaseModel):
@@ -50,19 +54,19 @@ async def create_api_key(
         logger.error(f"[AUTH ERROR] Token verification failed: {e}")
         raise HTTPException(status_code=401, detail="Unauthorized: Invalid session token.")
 
-    # 3. Validate OpenAI key format
-    cleaned_key = payload.upstream_key.strip()
-    if not cleaned_key.startswith("sk-"):
+    # 3. Validate an upstream key only when one was provided.
+    cleaned_key = (payload.upstream_key or "").strip()
+    if cleaned_key and (len(cleaned_key) < 10 or not cleaned_key.startswith("sk-")):
         raise HTTPException(
             status_code=400,
             detail="Invalid OpenAI key format. Key must begin with 'sk-'."
         )
 
-    # 4. Encrypt with AES-256 and store
+    # 4. Provision the proxy key; the upstream credential remains optional.
     try:
         raw_proxy_key = db_service.generate_proxy_key(
             user_id=authenticated_user_id,
-            raw_upstream_key=cleaned_key
+            raw_upstream_key=cleaned_key or None
         )
         logger.info(f"[KEY GENERATED] New proxy key generated for user: {authenticated_user_id}")
         return CreateKeyResponse(
@@ -71,8 +75,8 @@ async def create_api_key(
             message="Circuit Breaker key generated successfully."
         )
     except Exception as e:
-        logger.error(f"[KEY ERROR] Failed to encrypt or save key: {e}")
+        logger.error("[KEY ERROR] Failed to encrypt or save key (%s).", type(e).__name__)
         raise HTTPException(
             status_code=500,
-            detail=f"Failed to generate API key: {str(e)}"
+            detail="Failed to generate API key."
         )
