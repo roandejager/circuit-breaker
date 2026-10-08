@@ -43,7 +43,7 @@ export function CodeTabs() {
   };
 
   return (
-    <div className="overflow-hidden rounded-md border border-white/[0.08] bg-[#0d0e12]">
+    <div className="overflow-hidden rounded-md border border-white/[0.08] bg-[#0e1016]">
       <div className="flex items-center justify-between border-b border-white/[0.08] px-3">
         <div role="tablist" aria-label="Code sample language" className="flex gap-1">
           {(Object.keys(code) as Language[]).map((name) => (
@@ -54,20 +54,20 @@ export function CodeTabs() {
               aria-selected={language === name}
               onClick={() => { setLanguage(name); setCopied(false); setCopyError(''); }}
               className={`border-b px-3 py-3 font-mono text-xs ${
-                language === name ? 'border-zinc-300 text-white' : 'border-transparent text-zinc-500 hover:text-zinc-300'
+                language === name ? 'border-sky-400 text-sky-300' : 'border-transparent text-zinc-400 hover:text-zinc-200'
               }`}
             >
               {name}
             </button>
           ))}
         </div>
-        <button type="button" onClick={() => void copy()} className="inline-flex items-center gap-1.5 rounded px-2 py-1.5 font-mono text-[10px] text-zinc-400 hover:bg-zinc-900 hover:text-white">
-          {copied ? <Check aria-hidden="true" className="h-3.5 w-3.5" /> : <Copy aria-hidden="true" className="h-3.5 w-3.5" />}
+        <button type="button" onClick={() => void copy()} className="inline-flex items-center gap-2 rounded px-3 py-2 font-mono text-xs text-zinc-300 transition-colors duration-150 ease-out hover:bg-zinc-900 hover:text-sky-400">
+          {copied ? <Check aria-hidden="true" className="h-4 w-4" /> : <Copy aria-hidden="true" className="h-4 w-4" />}
           {copied ? 'Copied' : 'Copy'}
         </button>
       </div>
-      <pre role="tabpanel" className="overflow-x-auto p-4 font-mono text-xs leading-6 text-zinc-300 sm:p-5"><code>{highlightCode(code[language])}</code></pre>
-      {copyError && <p role="alert" className="border-t border-rose-900/60 px-4 py-2 text-xs text-rose-300">{copyError}</p>}
+      <pre role="tabpanel" className="min-w-0 overflow-x-auto p-4 font-mono text-xs leading-[1.5] text-zinc-300 sm:p-6"><code>{highlightCode(code[language])}</code></pre>
+      {copyError && <p role="alert" className="border-t border-rose-900/60 px-4 py-2 text-xs text-[#f87171]">{copyError}</p>}
     </div>
   );
 }
