@@ -234,7 +234,7 @@ export default function HomePage() {
             <p className="mt-1 text-xs text-zinc-400">Built by Roan de Jager (@roandejager) in Norway.</p>
             <p className="mt-2 max-w-4xl text-[11px] leading-5 text-zinc-500">I built Shunt after an autonomous agent got trapped in a recursive tool retry loop and burned through hundreds of dollars in API credits overnight. It&apos;s built in Python and FastAPI for sub-35ms raw performance with strict zero-payload retention.</p>
             <div className="mt-3 flex gap-4 font-mono text-[10px]">
-              <a href="https://github.com/roandejager/circuit-breaker" target="_blank" rel="noreferrer" className="text-zinc-400 hover:text-zinc-100">GitHub repository ↗</a>
+              <a href="https://github.com/roandejager/shunt" target="_blank" rel="noreferrer" className="text-zinc-400 hover:text-zinc-100">GitHub repository ↗</a>
               <a href="mailto:contact.roandejager@gmail.com" className="text-zinc-400 hover:text-zinc-100">Email Roan</a>
             </div>
           </div>

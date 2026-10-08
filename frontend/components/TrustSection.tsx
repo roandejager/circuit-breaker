@@ -165,7 +165,7 @@ export function TrustSection() {
               </p>
             </div>
           </div>
-          <a href="https://github.com/roandejager/circuit-breaker/blob/main/backend/app/api/proxy.py" target="_blank" rel="noreferrer" className="inline-flex shrink-0 items-center justify-center gap-2 rounded-md border border-sky-500/30 bg-[#0a0a0a] px-3 py-2 font-mono text-[10px] text-zinc-200 transition hover:border-sky-400 hover:text-sky-300">
+          <a href="https://github.com/roandejager/shunt/blob/main/app/api/proxy.py" target="_blank" rel="noreferrer" className="inline-flex shrink-0 items-center justify-center gap-2 rounded-md border border-sky-500/30 bg-[#0a0a0a] px-3 py-2 font-mono text-[10px] text-zinc-200 transition hover:border-sky-400 hover:text-sky-300">
             <span className="rounded border border-zinc-700 px-1 py-0.5 text-[9px]">GitHub</span>
             Inspect Proxy Source (Open Source)
             <ExternalLink aria-hidden="true" className="h-3 w-3 text-sky-400" />

@@ -53,7 +53,7 @@ export function Footer() {
         <div>
           <h2 className="font-mono text-[10px] uppercase tracking-wider text-zinc-500">Company</h2>
           <div className="mt-2 flex flex-col items-start gap-2 text-xs text-zinc-500">
-            <a href="https://github.com/roandejager/circuit-breaker" target="_blank" rel="noreferrer" className="hover:text-zinc-300">GitHub ↗</a>
+            <a href="https://github.com/roandejager/shunt" target="_blank" rel="noreferrer" className="hover:text-zinc-300">GitHub ↗</a>
             <Link href="/privacy" className="hover:text-zinc-300">Privacy</Link>
             <Link href="/terms" className="hover:text-zinc-300">Terms</Link>
           </div>
