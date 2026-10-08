@@ -1,4 +1,5 @@
 import hashlib
+import logging
 import secrets
 from datetime import datetime, timezone, timedelta
 from typing import Optional, Dict, Any, Tuple
@@ -6,6 +7,8 @@ from cryptography.fernet import Fernet
 from supabase import create_client, Client
 
 from app.core.config import settings
+
+logger = logging.getLogger(__name__)
 
 
 class DatabaseService:
@@ -31,16 +34,20 @@ class DatabaseService:
         return hashlib.sha256(raw_key.strip().encode("utf-8")).hexdigest()
 
     # --- API KEY OPERATIONS ---
-    def generate_proxy_key(self, user_id: str, raw_upstream_key: str) -> str:
+    def generate_proxy_key(self, user_id: str, raw_upstream_key: Optional[str] = None) -> str:
         """
-        Generates a secure circuit breaker proxy key (cb_live_...),
-        encrypts the upstream key, and stores the record in Supabase.
+        Generates a secure circuit breaker proxy key (cb_live_...), optionally
+        encrypting an upstream key before storing the record in Supabase.
         """
         raw_token = secrets.token_hex(24)
         raw_proxy_key = f"cb_live_{raw_token}"
         key_hash = self.hash_key(raw_proxy_key)
         key_prefix = raw_proxy_key[:12]
-        encrypted_upstream = self.encrypt_secret(raw_upstream_key)
+        encrypted_upstream = (
+            self.encrypt_secret(raw_upstream_key)
+            if raw_upstream_key
+            else ""
+        )
 
         data = {
             "user_id": user_id,
@@ -72,10 +79,19 @@ class DatabaseService:
         record = response.data[0]
         profile = record.get("profiles") or {}
         
-        try:
-            upstream_key = self.decrypt_secret(record["encrypted_upstream_key"])
-        except Exception:
-            return None
+        encrypted_upstream_key = record.get("encrypted_upstream_key")
+        if encrypted_upstream_key:
+            try:
+                upstream_key = self.decrypt_secret(encrypted_upstream_key)
+            except Exception as exc:
+                logger.error(
+                    "Unable to decrypt configured upstream key for API key %s (%s).",
+                    record.get("id"),
+                    type(exc).__name__,
+                )
+                upstream_key = None
+        else:
+            upstream_key = None
 
         return {
             "api_key_id": record["id"],
